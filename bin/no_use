@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Copyright (C) 2019 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+if [ "$#" -ne 1 ]; then
+    echo -e "Remove USE and CREATE DATABASE statements from sql dumps.\nPlease add dump filename as argument"
+    exit 1
+fi
+
+DUMP_FILE=$1
+
+if [ ! -f $DUMP_FILE ]; then
+    echo -e "File not found"
+    exit 1
+fi
+
+if [ "${DUMP_FILE##*.sql.}" = "gz" ]; then
+    gzcat $DUMP_FILE | sed -e '/^USE/d' -e '/^CREATE DATABASE/d' | gzip > ${DUMP_FILE%%.sql.gz}_no_use.sql.gz
+    exit
+fi
+
+if [ "${DUMP_FILE##*.}" = "sql" ]; then
+    cat $DUMP_FILE | sed -e '/^USE/d' -e '/^CREATE DATABASE/d' > ${DUMP_FILE%%.sql}_no_use.sql
+    exit
+fi
+
+echo -e "WRONG FILE EXTENSION\nSupport only *.sql.gz or *.sql"
+exit 1
+
