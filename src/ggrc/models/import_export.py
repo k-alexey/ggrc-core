@@ -4,9 +4,13 @@
 """ ImportExport model."""
 
 import json
+import uuid
 from datetime import datetime, timedelta
 from logging import getLogger
 
+from google.appengine.ext import deferred
+from google.appengine.api.taskqueue import Error as taskqueue_Error
+from google.appengine.api.taskqueue import TaskAlreadyExistsError
 from sqlalchemy.dialects import mysql
 
 from ggrc import db
@@ -49,6 +53,7 @@ class ImportExport(Identifiable, db.Model):
   status = db.Column(db.Enum(*IMPORT_EXPORT_STATUSES), nullable=False,
                      default=NOT_STARTED_STATUS)
   description = db.Column(db.Text)
+  task_name = db.Column(db.String(length=250))
   created_at = db.Column(db.DateTime, nullable=False)
   start_at = db.Column(db.DateTime)
   end_at = db.Column(db.DateTime)
@@ -96,7 +101,8 @@ def create_import_export_entry(**kwargs):
                         content=kwargs.get('content'),
                         gdrive_metadata=meta,
                         results=results,
-                        start_at=kwargs.get('start_at', None))
+                        start_at=kwargs.get('start_at', None),
+                        task_name=kwargs.get('task_name', str(uuid.uuid4())))
 
   db.session.add(ie_job)
   db.session.commit()
@@ -171,3 +177,55 @@ def clear_overtimed_tasks():
                      ie_job.job_type,
                      ie_job.id)
   db.session.commit()
+
+
+def idle_task():
+  pass
+
+
+def clear_failed_bg_tasks():
+  """
+  Check if active ImportExport have corresponding active background task.
+
+  We try to create new background task with same name as created by Im-/Export.
+  If we successfully created BG task, or receive TombstonedTaskError exception
+  we can consider original task as dead.
+  """
+  from ggrc.models.person import Person
+  from ggrc.notifications import job_emails
+  from ggrc.utils import get_url_root
+  active_jobs = ImportExport.query.filter(
+      ImportExport.status.in_([ImportExport.ANALYSIS_STATUS,
+                               ImportExport.IN_PROGRESS_STATUS])
+  )
+  for ie_job in active_jobs:
+    task_name = ie_job.task_name
+    task_running = False
+    try:
+      deferred.defer(idle_task,
+                     _queue="ggrcImport",
+                     _name=task_name)
+    except TaskAlreadyExistsError:
+      task_running = True
+    except taskqueue_Error as e:
+      logger.warning(e.message)
+    finally:
+      if not task_running:
+        ie_job.status = 'Failed'
+        ie_job.end_at = datetime.utcnow()
+        logger.warning("%s job ID:%d don't "
+                       "have corresponding "
+                       "background task. Status changed to Failed",
+                       ie_job.job_type,
+                       ie_job.id)
+        user = Person.query.get(ie_job.created_by_id)
+        try:
+          job_emails.send_email(
+              job_emails.EXPORT_FAILED,
+              user.email,
+              get_url_root()
+          )
+        except:
+          logger.warning("Unable to send notification "
+                         "about failed ImportExport")
+        db.session.commit()

@@ -23,6 +23,7 @@ HOURLY_CRON_JOBS = [
 ]
 
 HALF_HOUR_CRON_JOBS = [
+    import_export.clear_failed_bg_tasks,
     fast_digest.send_notification,
 ]
 

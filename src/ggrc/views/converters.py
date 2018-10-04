@@ -8,6 +8,7 @@ including the import/export api endponts.
 """
 
 import re
+import uuid
 
 from functools import wraps
 from logging import getLogger
@@ -380,6 +381,14 @@ def make_import_export_response(data):
   return current_app.make_response((response_json, 200, headers))
 
 
+def ie_mark_failed(ie_id):
+  """Change ImportExport status to Failed"""
+  ie = import_export.ImportExport.query.get(ie_id)
+  ie.status = "Failed"
+  ie.end_at = datetime.utcnow()
+  db.session.commit()
+
+
 def handle_start(ie_job, user_id):
   """Handle import start command"""
   if ie_job.status == "Not Started":
@@ -390,15 +399,19 @@ def handle_start(ie_job, user_id):
     raise BadRequest(app_errors.WRONG_STATUS)
   try:
     ie_job.start_at = datetime.utcnow()
+    task_name = str(uuid.uuid4())
+    ie_job.task_name = task_name
     db.session.commit()
     deferred.defer(run_import_phases,
                    ie_job.id,
                    user_id,
                    get_url_root(),
-                   _queue="ggrcImport")
+                   _queue="ggrcImport",
+                   _name=task_name)
     return make_import_export_response(ie_job.log_json())
   except Exception as e:
     logger.exception(e.message)
+    ie_mark_failed(ie_job.id)
     raise BadRequest(app_errors.JOB_FAILED.format(job_type="Import"))
 
 
@@ -440,7 +453,7 @@ def handle_get(id2, command, job_type):
       BadRequest("Unknown command")
     return handle_file_download(id2)
   try:
-    import_export.clear_overtimed_tasks()
+    import_export.clear_failed_bg_tasks()
     if id2:
       res = import_export.get(id2).log_json()
     else:
@@ -539,16 +552,19 @@ def handle_export_post(**kwargs):
         status="In Progress",
         title=filename,
         start_at=datetime.utcnow(),
+        task_name=str(uuid.uuid4())
     )
     deferred.defer(run_export,
                    objects,
                    ie.id,
                    user.id,
                    get_url_root(),
-                   _queue="ggrcImport")
+                   _queue="ggrcImport",
+                   _name=ie.task_name)
     return make_import_export_response(ie.log_json())
   except Exception as e:
     logger.exception(e.message)
+    ie_mark_failed(ie.id)
     raise BadRequest(
         app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
 
