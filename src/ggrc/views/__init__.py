@@ -36,7 +36,6 @@ from ggrc.login import admin_required
 from ggrc.models import all_models
 from ggrc.models import background_task
 from ggrc.models.background_task import create_task
-from ggrc.models.background_task import make_task_response
 from ggrc.models.background_task import queued_task
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.revision import Revision
@@ -250,6 +249,7 @@ def start_update_audit_issues(audit_id, message):
       method=u'POST',
       queued_callback=update_audit_issues
   )
+  db.session.commit()
   task.start()
 
 
@@ -562,6 +562,7 @@ def admin_reindex_snapshots():
       url=url_for(reindex_snapshots.__name__),
       queued_callback=reindex_snapshots,
   )
+  db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
@@ -578,6 +579,7 @@ def admin_reindex():
       url=url_for(reindex.__name__),
       queued_callback=reindex
   )
+  db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
@@ -594,6 +596,7 @@ def admin_full_reindex():
       url=url_for(full_reindex.__name__),
       queued_callback=full_reindex
   )
+  db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
@@ -624,6 +627,7 @@ def admin_propagate_acl():
 
   task_queue = create_task("propagate_acl", url_for(
       propagate_acl.__name__), propagate_acl)
+  db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
@@ -640,6 +644,7 @@ def admin_create_missing_revisions():
 
   task_queue = create_task("create_missing_revisions", url_for(
       create_missing_revisions.__name__), create_missing_revisions)
+  db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                         [('Content-Type', 'text/html')])))
@@ -659,12 +664,6 @@ def admin():
 def assessments_view():
   """The clutter-free list of all Person's Assessments"""
   return render_template("assessments_view/index.haml")
-
-
-@app.route("/background_task/<id_task>", methods=['GET'])
-def get_task_response(id_task):
-  """Gets the status of a background task"""
-  return make_task_response(id_task)
 
 
 @app.route(
@@ -840,6 +839,7 @@ def generate_children_issues():
       request.json,
       operation_type="generate_children_issues",
   )
+  db.session.commit()
   return task_queue.task_scheduled_response()
 
 
@@ -858,6 +858,7 @@ def generate_issues():
       run_issues_generation,
       request.json,
   )
+  db.session.commit()
   return task_queue.task_scheduled_response()
 
 
@@ -876,6 +877,7 @@ def update_issues():
       run_issues_update,
       request.json,
   )
+  db.session.commit()
   return task_queue.task_scheduled_response()
 
 
@@ -926,6 +928,7 @@ def generate_wf_tasks_notifs():
   task_queue = create_task("generate_wf_tasks_notifications",
                            url_for(generate_wf_tasks_notifications.__name__),
                            generate_wf_tasks_notifications)
+  db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                         [('Content-Type', 'text/html')])))

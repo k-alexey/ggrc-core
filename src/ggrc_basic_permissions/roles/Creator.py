@@ -22,6 +22,7 @@ owner_base = [
 owner_read = owner_base + [
     "AccessControlList",
     "AccessControlRole",
+    "BackgroundTask",
     {
         "type": "Relationship",
         "terms": {
