@@ -1349,6 +1349,32 @@ class ReadOnlyResource(Resource):
       raise NotImplementedError()
 
 
+class BackgroundTaskResource(ReadOnlyResource):
+  """Filter BackgroundTask API response
+
+  Filter response of BackgroundTask endpoints to include only id and status
+  """
+
+  def build_collection_representation(self, objs, extras=None):
+    objs = [
+        {k: v for k, v in o.iteritems() if k in ["id", "status"]}
+        for o in objs
+    ]
+    return super(BackgroundTaskResource, self).build_collection_representation(
+        objs, extras
+    )
+
+  def object_for_json(self, obj, model_name=None, properties_to_include=None):
+    response = super(BackgroundTaskResource, self).object_for_json(
+      obj, model_name, properties_to_include
+    )
+    obj_dict = response.get("background_task", {})
+    response["background_task"] = {
+        k: v for k, v in obj_dict.iteritems() if k in ["id", "status"]
+    }
+    return response
+
+
 class ExtendedResource(Resource):
   """Extended resource with additional command support."""
 

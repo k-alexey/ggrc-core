@@ -3,7 +3,7 @@
 
 """All GGRC REST services."""
 
-from ggrc.services.common import ReadOnlyResource
+from ggrc.services.common import ReadOnlyResource, BackgroundTaskResource
 from ggrc.services.registry import service
 
 
@@ -21,7 +21,7 @@ def contributed_services():
   from ggrc.models import review
 
   return [
-      service('background_tasks', models.BackgroundTask),
+      service('background_tasks', models.BackgroundTask, BackgroundTaskResource),
       service('access_groups', models.AccessGroup),
       service('audits', models.Audit, AuditResource),
       service('categorizations', models.Categorization),
