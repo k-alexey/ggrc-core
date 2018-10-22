@@ -21,7 +21,8 @@ def contributed_services():
   from ggrc.models import review
 
   return [
-      service('background_tasks', models.BackgroundTask, BackgroundTaskResource),
+      service('background_tasks', models.BackgroundTask,
+              BackgroundTaskResource),
       service('access_groups', models.AccessGroup),
       service('audits', models.Audit, AuditResource),
       service('categorizations', models.Categorization),
