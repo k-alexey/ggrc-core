@@ -625,8 +625,11 @@ def admin_propagate_acl():
   if get_current_user().email not in admins:
     raise exceptions.Forbidden()
 
-  task_queue = create_task("propagate_acl", url_for(
-      propagate_acl.__name__), propagate_acl)
+  task_queue = create_task(
+      name="propagate_acl",
+      url=url_for(propagate_acl.__name__),
+      queued_callback=propagate_acl,
+  )
   db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
@@ -642,8 +645,11 @@ def admin_create_missing_revisions():
   if get_current_user().email not in admins:
     raise exceptions.Forbidden()
 
-  task_queue = create_task("create_missing_revisions", url_for(
-      create_missing_revisions.__name__), create_missing_revisions)
+  task_queue = create_task(
+      name="create_missing_revisions",
+      url=url_for(create_missing_revisions.__name__),
+      queued_callback=create_missing_revisions,
+  )
   db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
@@ -833,10 +839,10 @@ def generate_children_issues():
   """
   validate_child_bulk_gen_data(request.json)
   task_queue = create_task(
-      "generate_children_issues",
-      url_for(run_children_issues_generation.__name__),
-      run_children_issues_generation,
-      request.json,
+      name="generate_children_issues",
+      url=url_for(run_children_issues_generation.__name__),
+      queued_callback=run_children_issues_generation,
+      parameters=request.json,
       operation_type="generate_children_issues",
   )
   db.session.commit()
@@ -853,10 +859,10 @@ def generate_issues():
   """
   validate_bulk_sync_data(request.json)
   task_queue = create_task(
-      "generate_issues",
-      url_for(run_issues_generation.__name__),
-      run_issues_generation,
-      request.json,
+      name="generate_issues",
+      url=url_for(run_issues_generation.__name__),
+      queued_callback=run_issues_generation,
+      parameters=request.json,
   )
   db.session.commit()
   return task_queue.task_scheduled_response()
@@ -872,10 +878,10 @@ def update_issues():
   """
   validate_bulk_sync_data(request.json)
   task_queue = create_task(
-      "update_issues",
-      url_for(run_issues_update.__name__),
-      run_issues_update,
-      request.json,
+      name="update_issues",
+      url=url_for(run_issues_update.__name__),
+      queued_callback=run_issues_update,
+      parameters=request.json,
   )
   db.session.commit()
   return task_queue.task_scheduled_response()
@@ -925,9 +931,11 @@ def validate_bulk_sync_data(json_data):
 @admin_required
 def generate_wf_tasks_notifs():
   """Generate notifications for updated wf cycle tasks."""
-  task_queue = create_task("generate_wf_tasks_notifications",
-                           url_for(generate_wf_tasks_notifications.__name__),
-                           generate_wf_tasks_notifications)
+  task_queue = create_task(
+      name="generate_wf_tasks_notifications",
+      url=url_for(generate_wf_tasks_notifications.__name__),
+      queued_callback=generate_wf_tasks_notifications,
+  )
   db.session.commit()
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,

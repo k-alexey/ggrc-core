@@ -1062,8 +1062,12 @@ class Resource(ModelView):
     with benchmark("collection post"):
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
-          task = create_task(request.method, request.full_path,
-                             None, request.data)
+          task = create_task(
+              name=request.method,
+              url=request.full_path,
+              queued_callback=None,
+              payload=request.data,
+          )
           db.session.commit()
           if getattr(settings, 'APP_ENGINE', False):
             return self.json_success_response(
@@ -1071,12 +1075,15 @@ class Resource(ModelView):
                 self.modified_at(task))
           body = self.request.json
         else:
-          task_name = request.headers.get(
-              "X-Task-Name",
-              request.values.get("task_name")
-          )
+          task_name = request.headers.get("X-Task-Name")
           task = BackgroundTask.query.filter_by(name=task_name).first()
-          body = json.loads(task.parameters)
+          if not task:
+            return current_app.make_response((
+                'BackgroundTask not found. Retry later.',
+                503,
+                [('Content-Type', 'text/html')]
+            ))
+          body = self.request.json
         task.start()
         no_result = True
       else:
