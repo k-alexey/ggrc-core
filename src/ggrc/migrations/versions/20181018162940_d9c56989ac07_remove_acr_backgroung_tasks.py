@@ -41,10 +41,17 @@ def upgrade():
   op.execute(acr_propagation.ACR_TABLE.delete().where(condition))
 
   sql = """
-    UPDATE background_tasks b1
-    JOIN background_tasks b2
-    ON b1.name = b2.name AND b1.id != b2.id AND b1.id > b2.id
-    SET b1.name = CONCAT(UUID(), "_", b1.name)
+      UPDATE background_tasks b
+      SET b.name = UUID()
+      WHERE b.name is null
+  """
+  op.execute(sql)
+
+  sql = """
+      UPDATE background_tasks b1
+      JOIN background_tasks b2
+      ON b1.name = b2.name AND b1.id != b2.id AND b1.id > b2.id
+      SET b1.name = CONCAT(UUID(), "_", b1.name)
   """
   op.execute(sql)
 
