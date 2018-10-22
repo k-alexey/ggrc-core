@@ -36,15 +36,14 @@ BANNED_HEADERS = {
     "X-Appengine-Tasketa",
     "X-Appengine-Taskexecutioncount",
     "X-Appengine-Taskretrycount",
-    "X-Task-Id",
     "X-Task-Name",
 }
 
 RETRY_OPTIONS = {
-    'min_backoff_seconds': 30,
-    'max_backoff_seconds': 3600,
-    'max_doublings': 5,
-    'task_retry_limit': 15,
+    "min_backoff_seconds": 30,
+    "max_backoff_seconds": 3600,
+    "max_doublings": 5,
+    "task_retry_limit": 10,
 }
 
 
@@ -58,7 +57,7 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
       "Success",
       "Failure"
   ]
-  name = deferred(db.Column(db.String), 'BackgroundTask')
+  name = db.Column(db.String, nullable=False, unique=True)
   parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
   result = deferred(db.Column(CompressedType), 'BackgroundTask')
 
@@ -134,20 +133,20 @@ def collect_task_headers():
   return Headers({k: v for k, v in request.headers if k not in BANNED_HEADERS})
 
 
-# pylint: disable=too-many-arguments
-def create_task(name, url, queued_callback=None, parameters=None, method=None,
-                operation_type=None, task_kwargs=None):
+def create_task(name, url, **kwargs):
   """Create a enqueue a background task."""
   with benchmark("Create background task"):
-    method = method or request.method
-    parameters = parameters or dict()
-    task_kwargs = task_kwargs or dict()
-    queue = task_kwargs.get("queue", "ggrc")
+    queued_callback = kwargs.get("queued_callback", None)
+    parameters = kwargs.get("parameters", dict())
+    method = kwargs.get("method", request.method)
+    operation_type = kwargs.get("operation_type", None)
+    payload = kwargs.get("payload", None)
+    queue = kwargs.get("queue", "ggrc")
     retry_options = RETRY_OPTIONS.copy()
-    retry_options.update(task_kwargs.get("retry_options", dict()))
+    retry_options.update(kwargs.get("retry_options", dict()))
 
+    bg_operation, parent_type, parent_id = None, None, None
     if operation_type:
-      parent_type, parent_id = None, None
       if isinstance(parameters, dict):
         parent_type = parameters.get("parent", {}).get("type")
         parent_id = parameters.get("parent", {}).get("id")
@@ -158,10 +157,8 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None,
             )
         )
       bg_operation = create_bg_operation(operation_type, parent_type, parent_id)
-    else:
-      bg_operation = None
 
-    bg_task_name = "{}_{}".format(name, uuid.uuid4())
+    bg_task_name = "{}_{}".format(uuid.uuid4(), name)
     bg_task = BackgroundTask(
         name=bg_task_name,
         bg_operation=bg_operation,
@@ -170,22 +167,29 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None,
     )
     db.session.add(bg_task)
 
-    if getattr(settings, 'APP_ENGINE', False):
+    if getattr(settings, "APP_ENGINE", False):
       from google.appengine.api import taskqueue
       headers = collect_task_headers()
-      headers.add('X-Task-Name', bg_task_name)
+      headers.add("X-Task-Name", bg_task_name)
       queued_task_name = "{}_{}".format(uuid.uuid4(), bg_task_name)
-      task = taskqueue.Queue(queue).add_async(
-          taskqueue.Task(
-              url=url,
-              name=queued_task_name,
-              params={'task_name': bg_task_name},
-              method=method,
-              headers=headers,
-              retry_options=taskqueue.TaskRetryOptions(**retry_options),
-          )
-      )
-      if not getattr(settings, 'PROD_APPSERVER', False):
+      try:
+        task = taskqueue.Queue(queue).add_async(
+            taskqueue.Task(
+                url=url,
+                name=queued_task_name,
+                params=parameters,
+                payload=payload,
+                method=method,
+                headers=headers,
+                retry_options=taskqueue.TaskRetryOptions(**retry_options),
+            )
+        )
+      except taskqueue.Error:
+        bg_task.status = "Failure"
+      if not getattr(settings, "PROD_APPSERVER", False):
+        # On local SDK development appserver we need to wait result
+        # to successfully enqueue task.
+        # In Google Cloud async adding tasks works properly.
         task.get_result()
     elif queued_callback:
       queued_callback(bg_task)
@@ -277,11 +281,12 @@ def queued_task(func):
     if args and isinstance(args[0], BackgroundTask):
       task = args[0]
     else:
-      task_name = request.headers.get("X-Task-Name", request.values.get("task_name"))
+      task_name = request.headers.get("X-Task-Name")
       task = BackgroundTask.query.filter_by(name=task_name).first()
     if not task:
-      return app.make_response((
-                'BackgroundTask not found. Retry later.', 503, [('Content-Type', 'text/html')]))
+      return app.make_response(('BackgroundTask not found. Retry later.',
+                                503,
+                                [('Content-Type', 'text/html')]))
     task.start()
     try:
       result = func(task)
