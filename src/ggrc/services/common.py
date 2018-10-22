@@ -1356,6 +1356,7 @@ class ReadOnlyResource(Resource):
       raise NotImplementedError()
 
 
+# pylint: disable=abstract-method
 class BackgroundTaskResource(ReadOnlyResource):
   """Filter BackgroundTask API response
 
@@ -1373,7 +1374,7 @@ class BackgroundTaskResource(ReadOnlyResource):
 
   def object_for_json(self, obj, model_name=None, properties_to_include=None):
     response = super(BackgroundTaskResource, self).object_for_json(
-      obj, model_name, properties_to_include
+        obj, model_name, properties_to_include
     )
     obj_dict = response.get("background_task", {})
     response["background_task"] = {

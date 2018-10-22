@@ -23,7 +23,6 @@ from ggrc.models.mixins import Base
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Stateful
 from ggrc.models.types import CompressedType
-from ggrc.models import reflection
 from ggrc.utils import benchmark
 
 logger = getLogger(__name__)
@@ -133,8 +132,9 @@ def collect_task_headers():
   return Headers({k: v for k, v in request.headers if k not in BANNED_HEADERS})
 
 
+# pylint: disable=too-many-locals
 def create_task(name, url, **kwargs):
-  """Create a enqueue a background task."""
+  """Create and enqueue a background task."""
   with benchmark("Create background task"):
     queued_callback = kwargs.get("queued_callback", None)
     parameters = kwargs.get("parameters", dict())
@@ -156,7 +156,8 @@ def create_task(name, url, **kwargs):
                 operation_type, parent_type, parent_id
             )
         )
-      bg_operation = create_bg_operation(operation_type, parent_type, parent_id)
+      bg_operation = create_bg_operation(operation_type,
+                                         parent_type, parent_id)
 
     bg_task_name = "{}_{}".format(uuid.uuid4(), name)
     bg_task = BackgroundTask(

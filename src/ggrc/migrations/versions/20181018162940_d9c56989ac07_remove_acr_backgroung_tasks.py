@@ -41,10 +41,10 @@ def upgrade():
   op.execute(acr_propagation.ACR_TABLE.delete().where(condition))
 
   sql = """
-    UPDATE background_tasks b1 
-    JOIN background_tasks b2 
+    UPDATE background_tasks b1
+    JOIN background_tasks b2
     ON b1.name = b2.name AND b1.id != b2.id AND b1.id > b2.id
-    SET b1.name = CONCAT(b1.name, "_", UUID())
+    SET b1.name = CONCAT(UUID(), "_", b1.name)
   """
   op.execute(sql)
 
@@ -74,7 +74,7 @@ def downgrade():
           my_work=False,
       )
   )
-  
+
   op.drop_constraint(None, 'background_tasks', type_='unique')
   op.alter_column(
       'background_tasks',
