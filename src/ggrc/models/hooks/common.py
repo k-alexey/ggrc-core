@@ -62,4 +62,5 @@ def _handle_obj_delete(mapper, connection, target):
 def init_hook():
   """Initializes common hooks."""
   for model in all_models.all_models:
-    sa.event.listen(model, "after_delete", _handle_obj_delete)
+    if issubclass(model, (mixin.Indexed, attributable.Attributable)):
+      sa.event.listen(model, "after_delete", _handle_obj_delete)

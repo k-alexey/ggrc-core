@@ -90,10 +90,10 @@ def register_fulltext_listeners():
   ggrc_indexer = fulltext.get_indexer()
 
   for model in all_models.all_models:
-    for action in ACTIONS:
-      event.listen(model, action, _runner)
     if not issubclass(model, mixin.Indexed):
       continue
+    for action in ACTIONS:
+      event.listen(model, action, _runner)
     for sub_model in model.mro():
       for rule in getattr(sub_model, "AUTO_REINDEX_RULES", []):
         ggrc_indexer.indexer_rules[rule.model].append(rule.rule)
