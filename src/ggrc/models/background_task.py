@@ -58,6 +58,7 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
   ]
   name = db.Column(db.String, nullable=False, unique=True)
   parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
+  payload = deferred(db.Column(CompressedType), 'BackgroundTask')
   result = deferred(db.Column(CompressedType), 'BackgroundTask')
 
   bg_operation = db.relationship(
@@ -129,7 +130,9 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
 
 def collect_task_headers():
   """Get headers required for appengine background task run."""
-  return Headers({k: v for k, v in request.headers if k not in BANNED_HEADERS})
+  return Headers({k: v for k, v
+                  in getattr(request, "headers", {})
+                  if k not in BANNED_HEADERS})
 
 
 # pylint: disable=too-many-locals
@@ -138,32 +141,21 @@ def create_task(name, url, **kwargs):
   with benchmark("Create background task"):
     queued_callback = kwargs.get("queued_callback", None)
     parameters = kwargs.get("parameters", dict())
-    method = kwargs.get("method", request.method)
+    method = kwargs.get("method", "POST")
     operation_type = kwargs.get("operation_type", None)
     payload = kwargs.get("payload", None)
     queue = kwargs.get("queue", "ggrc")
     retry_options = RETRY_OPTIONS.copy()
     retry_options.update(kwargs.get("retry_options", dict()))
 
-    bg_operation, parent_type, parent_id = None, None, None
-    if operation_type:
-      if isinstance(parameters, dict):
-        parent_type = parameters.get("parent", {}).get("type")
-        parent_id = parameters.get("parent", {}).get("id")
-      if bg_operation_running(operation_type, parent_type, parent_id):
-        raise exceptions.BadRequest(
-            "Task '{}' already run for {} {}.".format(
-                operation_type, parent_type, parent_id
-            )
-        )
-      bg_operation = create_bg_operation(operation_type,
-                                         parent_type, parent_id)
+    bg_operation = check_and_create_bg_operation(operation_type, parameters)
 
     bg_task_name = "{}_{}".format(uuid.uuid4(), name)
     bg_task = BackgroundTask(
         name=bg_task_name,
         bg_operation=bg_operation,
         parameters=parameters,
+        payload=payload,
         modified_by=get_current_user(),
     )
     db.session.add(bg_task)
@@ -172,12 +164,11 @@ def create_task(name, url, **kwargs):
       from google.appengine.api import taskqueue
       headers = collect_task_headers()
       headers.add("X-Task-Name", bg_task_name)
-      queued_task_name = "{}_{}".format(uuid.uuid4(), bg_task_name)
       try:
         task = taskqueue.Queue(queue).add_async(
             taskqueue.Task(
                 url=url,
-                name=queued_task_name,
+                name=bg_task_name,
                 params=parameters,
                 payload=payload,
                 method=method,
@@ -185,12 +176,12 @@ def create_task(name, url, **kwargs):
                 retry_options=taskqueue.TaskRetryOptions(**retry_options),
             )
         )
-      except taskqueue.Error:
+      except taskqueue.Error as e:
+        logger.warning(e.message)
         bg_task.status = "Failure"
       if not getattr(settings, "PROD_APPSERVER", False):
-        # On local SDK development appserver we need to wait result
-        # to successfully enqueue task.
-        # In Google Cloud async adding tasks works properly.
+        # On local SDK development appserver we need to wait result to
+        # enqueue task. In Google Cloud async adding tasks works properly.
         task.get_result()
     elif queued_callback:
       queued_callback(bg_task)
@@ -229,6 +220,26 @@ def create_lightweight_task(name, url, queued_callback=None, parameters=None,
     raise ValueError(
         "Either queued_callback should be provided or APP_ENGINE set to true."
     )
+
+
+def check_and_create_bg_operation(operation_type, parameters):
+  """Check if there is running BackgroundOperation, if not create it"""
+  if operation_type:
+    with benchmark("Create background task. Check bg_operation"):
+      parent_type, parent_id = None, None
+      if isinstance(parameters, dict):
+        parent_type = parameters.get("parent", {}).get("type")
+        parent_id = parameters.get("parent", {}).get("id")
+      if not all(parent_type, parent_id):
+        raise ValueError("parameters should contain parent.id and parent.type "
+                         "if operation_type specified")
+      if bg_operation_running(operation_type, parent_type, parent_id):
+        raise exceptions.BadRequest(
+            "Task '{}' already run for {} {}.".format(
+                operation_type, parent_type, parent_id
+            )
+        )
+      return create_bg_operation(operation_type, parent_type, parent_id)
 
 
 def create_bg_operation(operation_type, object_type, object_id):
