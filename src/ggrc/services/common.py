@@ -1060,20 +1060,21 @@ class Resource(ModelView):
   @utils.validate_mimetype("application/json")  # noqa
   def collection_post(self):
     with benchmark("collection post"):
+      no_result = False
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
           task = create_task(
               name=request.method,
               url=request.full_path,
-              queued_callback=None,
+              queued_callback=lambda _: None,
               payload=request.data,
           )
           db.session.commit()
           if getattr(settings, 'APP_ENGINE', False):
             return self.json_success_response(
                 self.object_for_json(task, 'background_task'),
-                self.modified_at(task))
-          body = self.request.json
+                self.modified_at(task)
+            )
         else:
           task_name = request.headers.get("X-Task-Name")
           task = BackgroundTask.query.filter_by(name=task_name).first()
@@ -1083,12 +1084,10 @@ class Resource(ModelView):
                 503,
                 [('Content-Type', 'text/html')]
             ))
-          body = self.request.json
         task.start()
         no_result = True
-      else:
-        body = self.request.json
-        no_result = False
+
+      body = self.request.json
       wrap = isinstance(body, dict)
       if wrap:
         body = [body]
@@ -1178,13 +1177,13 @@ class Resource(ModelView):
         result = current_app.make_response(
             (self.as_json(res), status, headers))
 
-      with benchmark("collection post > return result"):
-        if 'X-GGRC-BackgroundTask' in request.headers:
+      if 'X-GGRC-BackgroundTask' in request.headers:
+        with benchmark("collection post > finish BackgroundTask"):
           if status == 200:
             task.finish("Success", result)
           else:
             task.finish("Failure", result)
-        return result
+      return result
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):

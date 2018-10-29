@@ -9,11 +9,12 @@ Create Date: 2018-10-18 16:29:40.409113
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
-import datetime
 import sqlalchemy as sa
 
 from sqlalchemy.dialects import mysql
 from alembic import op
+
+from ggrc.models.types import CompressedType
 from ggrc.migrations.utils import acr_propagation
 
 
@@ -25,8 +26,8 @@ ROLE_NAME = "Admin"
 OBJECT_TYPE = "BackgroundTask"
 
 
-def upgrade():
-  """Downgrade database schema and/or data back to the previous revision."""
+def remove_acl_acr_of_bg_tasks():
+  """Remove ACL and ACR related to BackgroundTask objects"""
   condition = sa.and_(
       acr_propagation.ACR_TABLE.c.name == ROLE_NAME,
       acr_propagation.ACR_TABLE.c.object_type == OBJECT_TYPE,
@@ -40,6 +41,9 @@ def upgrade():
   )
   op.execute(acr_propagation.ACR_TABLE.delete().where(condition))
 
+
+def alter_name_column():
+  """Populate null and add unique constraint to 'name' column"""
   sql = """
       UPDATE background_tasks b
       SET b.name = UUID()
@@ -64,28 +68,23 @@ def upgrade():
   op.create_unique_constraint(None, 'background_tasks', ['name'])
 
 
-def downgrade():
-  """Upgrade database schema and/or data, creating a new revision."""
-  op.execute(
-      acr_propagation.ACR_TABLE.insert().values(
-          name=ROLE_NAME,
-          object_type=OBJECT_TYPE,
-          parent_id=None,
-          created_at=datetime.datetime.now(),
-          updated_at=datetime.datetime.now(),
-          internal=False,
-          non_editable=True,
-          read=True,
-          update=True,
-          delete=True,
-          my_work=False,
-      )
+def add_payload_column():
+  """Add 'payload' column to BackgroundTask"""
+  op.add_column(
+      'background_tasks',
+      sa.Column('payload',
+                CompressedType(length=16777215),
+                nullable=True)
   )
 
-  op.drop_constraint(None, 'background_tasks', type_='unique')
-  op.alter_column(
-      'background_tasks',
-      'name',
-      existing_type=mysql.VARCHAR(length=250),
-      nullable=True
-  )
+
+def upgrade():
+  """Downgrade database schema and/or data back to the previous revision."""
+  remove_acl_acr_of_bg_tasks()
+  alter_name_column()
+  add_payload_column()
+
+
+def downgrade():
+  """Upgrade database schema and/or data, creating a new revision."""
+  raise Exception("Downgrade is not supported.")
