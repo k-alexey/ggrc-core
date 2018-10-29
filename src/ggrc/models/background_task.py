@@ -135,60 +135,61 @@ def collect_task_headers():
                   if k not in BANNED_HEADERS})
 
 
-# pylint: disable=too-many-locals
-def create_task(name, url, **kwargs):
-  """Create and enqueue a background task."""
+class Args(dict):
+  """"""
+  DEFAULT = {}
+
+  def __init__(self, *args, **kwargs):
+    _kwargs = type(self).DEFAULT.copy()
+    _kwargs.update(kwargs)
+    super(Args, self).__init__(*args, **_kwargs)
+
+  def __getattr__(self, key):
+    return self.get(key)
+
+  def __getitem__(self, item):
+    return self.get(item)
+
+  def __setattr__(self, key, value):
+    self.__setitem__(key, value)
+
+
+class TaskArgs(Args):
+  DEFAULT = {
+    "method": "POST",
+    "queue": "ggrc",
+    "parameters": dict(),
+    "retry_options": dict(),
+  }
+
+
+def create_task(**kwargs):
+  """Create and enqueue a background task.
+
+    # queued_callback = kwargs.get("queued_callback", None)
+    # parameters = kwargs.get("parameters", dict())
+    # method = kwargs.get("method", "POST")
+    # operation_type = kwargs.get("operation_type", None)
+    # payload = kwargs.get("payload", None)
+    # queue = kwargs.get("queue", "ggrc")
+    # retry_options = RETRY_OPTIONS.copy()
+    # retry_options.update(kwargs.get("retry_options", dict()))"""
   with benchmark("Create background task"):
-    queued_callback = kwargs.get("queued_callback", None)
-    parameters = kwargs.get("parameters", dict())
-    method = kwargs.get("method", "POST")
-    operation_type = kwargs.get("operation_type", None)
-    payload = kwargs.get("payload", None)
-    queue = kwargs.get("queue", "ggrc")
-    retry_options = RETRY_OPTIONS.copy()
-    retry_options.update(kwargs.get("retry_options", dict()))
+    a = TaskArgs(kwargs)
 
-    bg_operation = check_and_create_bg_operation(operation_type, parameters)
+    a.bg_operation = check_and_create_bg_operation(a.operation_type, a.parameters)
 
-    bg_task_name = "{}_{}".format(uuid.uuid4(), name)
-    bg_task = BackgroundTask(
-        name=bg_task_name,
-        bg_operation=bg_operation,
-        parameters=parameters,
-        payload=payload,
-        modified_by=get_current_user(),
-    )
-    db.session.add(bg_task)
+    a.bg_task_name = "{}_{}".format(uuid.uuid4(), a.name)
+    a.bg_task = _create_bg_task(**a)
 
     if getattr(settings, "APP_ENGINE", False):
-      from google.appengine.api import taskqueue
-      headers = collect_task_headers()
-      headers.add("X-Task-Name", bg_task_name)
-      try:
-        task = taskqueue.Queue(queue).add_async(
-            taskqueue.Task(
-                url=url,
-                name=bg_task_name,
-                params=parameters,
-                payload=payload,
-                method=method,
-                headers=headers,
-                retry_options=taskqueue.TaskRetryOptions(**retry_options),
-            )
-        )
-      except taskqueue.Error as e:
-        logger.warning(e.message)
-        bg_task.status = "Failure"
-      if not getattr(settings, "PROD_APPSERVER", False):
-        # On local SDK development appserver we need to wait result to
-        # enqueue task. In Google Cloud async adding tasks works properly.
-        task.get_result()
-    elif queued_callback:
-      queued_callback(bg_task)
+      _enqueue_task(**a)
+    elif a.queued_callback:
+      a.queued_callback(a.bg_task)
     else:
       raise ValueError("Either queued_callback should be provided "
                        "or APP_ENGINE set to true.")
-    return bg_task
+    return a.bg_task
 
 
 def create_lightweight_task(name, url, queued_callback=None, parameters=None,
@@ -220,6 +221,47 @@ def create_lightweight_task(name, url, queued_callback=None, parameters=None,
     raise ValueError(
         "Either queued_callback should be provided or APP_ENGINE set to true."
     )
+
+
+def _create_bg_task(**kwargs):
+  """"""
+  a = TaskArgs(kwargs)
+  bg_task = BackgroundTask(
+      name=a.bg_task_name,
+      bg_operation=a.bg_operation,
+      parameters=a.parameters,
+      payload=a.payload,
+      modified_by=get_current_user(),
+  )
+  db.session.add(bg_task)
+  return bg_task
+
+
+def _enqueue_task(**kwargs):
+  """"""
+  a = TaskArgs(kwargs)
+  from google.appengine.api import taskqueue
+  headers = collect_task_headers()
+  headers.add("X-Task-Name", a.bg_task_name)
+  try:
+    task = taskqueue.Queue(a.queue).add_async(
+        taskqueue.Task(
+            url=a.url,
+            name=a.bg_task_name,
+            params=a.parameters,
+            payload=a.payload,
+            method=a.method,
+            headers=headers,
+            retry_options=taskqueue.TaskRetryOptions(**a.retry_options),
+        )
+    )
+  except taskqueue.Error as e:
+    logger.warning(e.message)
+    a.bg_task.status = "Failure"
+  if not getattr(settings, "PROD_APPSERVER", False):
+    # On local SDK development appserver we need to wait result to
+    # enqueue task. In Google Cloud async adding tasks works properly.
+    task.get_result()
 
 
 def check_and_create_bg_operation(operation_type, parameters):
