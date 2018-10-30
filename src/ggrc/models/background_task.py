@@ -208,6 +208,7 @@ def _check_and_create_bg_operation(operation_type, parameters):
 
 
 def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
+  """Create BackgroundTasks object"""
   parameters = parameters or dict()
   bg_task = BackgroundTask(
       name=name,
@@ -224,6 +225,8 @@ def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
 def _enqueue_task(name, url, bg_task=None, queued_callback=None,
                   parameters=None, method="POST", payload=None,
                   queue="ggrc", retry_options=None):
+  """Create task in queue if running in AppEngine,
+  otherwise execute queued_callback() """
   parameters = parameters or dict()
   retry_options = retry_options or RETRY_OPTIONS
   if getattr(settings, "APP_ENGINE", False):

@@ -1363,6 +1363,7 @@ class BackgroundTaskResource(ReadOnlyResource):
   """
 
   def build_collection_representation(self, objs, extras=None):
+    """Filter /api/background_tasks response"""
     objs = [
         {k: v for k, v in o.iteritems() if k in ["id", "status"]}
         for o in objs
@@ -1372,6 +1373,7 @@ class BackgroundTaskResource(ReadOnlyResource):
     )
 
   def object_for_json(self, obj, model_name=None, properties_to_include=None):
+    """Filter /api/background_tasks/id response"""
     response = super(BackgroundTaskResource, self).object_for_json(
         obj, model_name, properties_to_include
     )
