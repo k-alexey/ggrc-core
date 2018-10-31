@@ -11,10 +11,9 @@ from sqlalchemy import event
 
 from ggrc import db
 from ggrc import fulltext
-from ggrc import utils
-from ggrc.models import all_models, get_model
+from ggrc.models import all_models
 from ggrc.fulltext import mixin
-from ggrc.utils import benchmark, helpers
+from ggrc.utils import benchmark, helpers, request_storage
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
 
@@ -54,16 +53,13 @@ class ReindexSet(threading.local):
     """Function that clear and push new full text records in DB."""
     with benchmark("push ft records into DB"):
       self.warmup()
-      for obj in db.session:
-        if not isinstance(obj, mixin.Indexed):
-          continue
-        if obj.id in self.model_ids_to_reindex.get(obj.type, set()):
-          db.session.expire(obj)
-      for model_name in self.model_ids_to_reindex.keys():
-        ids = self.model_ids_to_reindex.pop(model_name)
-        chunk_list = utils.list_chunks(list(ids), chunk_size=self.CHUNK_SIZE)
-        for ids_chunk in chunk_list:
-          get_model(model_name).bulk_record_update_for(ids_chunk)
+      if self.model_ids_to_reindex:
+        reindex_ids = request_storage.get("indexing", {})
+        for model, ids in self.model_ids_to_reindex.items():
+          if model not in reindex_ids:
+            reindex_ids[model] = set()
+          reindex_ids[model].update(set(ids))
+
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument

@@ -26,7 +26,7 @@ from ggrc import extensions
 from ggrc import notifications
 from ggrc import settings
 from ggrc.gdrive import init_gdrive_routes
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, request_storage
 from ggrc.utils.issue_tracker_mock import init_issue_tracker_mock
 
 if settings.ISSUE_TRACKER_MOCK and not settings.PRODUCTION:
@@ -274,6 +274,27 @@ def _display_request_time():
       performance_logger.info(str_, *payload)
     return response
 
+
+def _indexing():
+  from ggrc.models import background_task
+  from ggrc.views import bg_push_ft_records
+
+  @app.after_request
+  def create_indexing_bg_task(response):
+    model_ids = request_storage.get("indexing", {})
+    if model_ids:
+      with benchmark("create indexing bg task"):
+        background_task.create_task(
+            name="indexing",
+            url=url_for(bg_push_ft_records.__name__),
+            parameters={"models_ids": model_ids},
+            method="POST",
+            queued_callback=bg_push_ft_records
+        )
+        db.session.plain_commit()
+    return response
+
+
 setup_error_handlers(app)
 init_models(app)
 configure_flask_login(app)
@@ -290,3 +311,4 @@ _enable_debug_toolbar()
 _enable_jasmine()
 _display_sql_queries()
 _display_request_time()
+_indexing()

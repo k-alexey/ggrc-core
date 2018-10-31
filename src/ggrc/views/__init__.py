@@ -35,6 +35,7 @@ from ggrc.login import login_required
 from ggrc.login import admin_required
 from ggrc.models import all_models
 from ggrc.models import background_task
+from ggrc.models import get_model
 from ggrc.models.background_task import create_task
 from ggrc.models.background_task import queued_task
 from ggrc.models.reflection import AttributeInfo
@@ -123,6 +124,21 @@ def compute_attributes(*_, **kwargs):
     from ggrc.data_platform import computed_attributes
     computed_attributes.compute_attributes(revision_ids)
     return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/_background_tasks/indexing", methods=["POST"])
+@queued_task
+def bg_push_ft_records(task):
+  """Background indexing endpoint"""
+  with benchmark("background indexing. push ft records"):
+    model_ids_to_reindex = task.parameters.get("models_ids", {})
+    for model_name, ids in model_ids_to_reindex.items():
+      chunk_list = utils.list_chunks(list(ids), chunk_size=50)
+      for ids_chunk in chunk_list:
+        get_model(model_name).bulk_record_update_for(ids_chunk)
+  with benchmark("background indexing. plain_commit"):
+    db.session.plain_commit()
+  return app.make_response(('success', 200, [('Content-Type', 'text/html')]))
 
 
 @app.route('/_background_tasks/update_audit_issues', methods=['POST'])
