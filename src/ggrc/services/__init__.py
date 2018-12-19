@@ -16,6 +16,7 @@ def contributed_services():
   from ggrc.services.resources.audit import AuditResource
   from ggrc.services.resources.assessment import AssessmentResource
   from ggrc.services.resources.person import PersonResource
+  from ggrc.services.resources.snapshot import SnapshotResource
   from ggrc.services.resources.issue import IssueResource
   from ggrc.services.resources import related_assessments
   from ggrc.access_control.role import AccessControlRole
@@ -70,7 +71,7 @@ def contributed_services():
       service('metrics', models.Metric),
       service('notification_configs', models.NotificationConfig),
       service('issues', models.Issue, IssueResource),
-      service('snapshots', models.Snapshot),
+      service('snapshots', models.Snapshot, SnapshotResource),
       service('access_control_roles', AccessControlRole),
       service('labels', models.Label),
       service('proposals', models.Proposal),

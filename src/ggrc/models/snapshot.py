@@ -14,10 +14,12 @@ from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
+from werkzeug.exceptions import Conflict
 
 from ggrc import builder
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.models.mixins.rest_handable import WithDeleteHandable
 from ggrc.utils import benchmark
 from ggrc.login import get_current_user_id
 from ggrc.models import mixins
@@ -29,8 +31,9 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 
 
-class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
-               base.ContextRBAC, mixins.Base, db.Model):
+class Snapshot(WithDeleteHandable, Roleable, relationship.Relatable,
+               WithLastAssessmentDate, base.ContextRBAC, mixins.Base,
+               db.Model):
   """Snapshot object that holds a join of parent object, revision, child object
   and parent object's context.
 
@@ -165,6 +168,18 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
         db.Index("ix_snapshots_parent", "parent_type", "parent_id"),
         db.Index("ix_snapshots_child", "child_type", "child_id"),
     )
+
+  def _check_related_objects(self):
+    """Checks that Snapshot mapped only to
+    Audits or Snapshots before deletion"""
+    for obj in self.related_objects():
+      if obj.type not in ("Audit", "Snapshot"):
+        raise Conflict(description="Snapshot should be mapped to Audit only "
+                                   "before deletion")
+
+  def handle_delete(self):
+    """Handle model_deleted signal for Snapshot"""
+    self._check_related_objects()
 
 
 class Snapshotable(object):
