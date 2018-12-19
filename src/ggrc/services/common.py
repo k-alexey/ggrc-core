@@ -451,6 +451,11 @@ class Resource(ModelView):
           logger.exception(err)
           message = translate_message(err)
           raise BadRequest(message)
+        except HTTPException as error:
+          return current_app.make_response(
+              (json.dumps({"message": error.description or ""}),
+               error.code or 500,
+               [("Content-Type", "application/json")]))
         except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
           err.message = ggrc_errors.BAD_REQUEST_MESSAGE
@@ -467,7 +472,7 @@ class Resource(ModelView):
     """POST operation handler."""
     raise NotImplementedError()
 
-  def get(self, id):
+  def get(self, id):  # pylint: disable=redefined-builtin
     """Default JSON request handlers"""
     with benchmark("Query for object"):
       obj = self.get_object(id)
@@ -571,7 +576,7 @@ class Resource(ModelView):
       raise Forbidden()
 
   @utils.validate_mimetype("application/json")
-  def put(self, id):
+  def put(self, id):  # pylint: disable=redefined-builtin
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -666,7 +671,7 @@ class Resource(ModelView):
     else:
       flask.g.referenced_object_stubs = {obj.type: {obj.id}}
 
-  def delete(self, id):
+  def delete(self, id):  # pylint: disable=redefined-builtin
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:

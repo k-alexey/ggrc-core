@@ -27,6 +27,24 @@ class WithPutHandable(object):
       model.handle_put(kwargs["obj"])
 
 
+class WithDeleteHandable(object):
+  """Mixin that adds DELETE handler"""
+  __lazy_init__ = True
+
+  def handle_delete(self):
+    """DELETE handler"""
+    raise NotImplementedError
+
+  @classmethod
+  def init(cls, model):
+    """Init handlers"""
+    # pylint: disable=unused-variable,unused-argument
+    @signals.Restful.model_deleted.connect_via(model)
+    def model_delete(*args, **kwargs):
+      """PUT handler"""
+      model.handle_delete(kwargs["obj"])
+
+
 class WithPostHandable(object):
   """Mixin that adds POST handler"""
   __lazy_init__ = True
