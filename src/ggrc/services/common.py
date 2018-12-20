@@ -452,10 +452,13 @@ class Resource(ModelView):
           message = translate_message(err)
           raise BadRequest(message)
         except HTTPException as error:
-          return current_app.make_response(
-              (json.dumps({"message": error.description or ""}),
-               error.code or 500,
-               [("Content-Type", "application/json")]))
+          message = error.description or ""
+          code = error.code or 500
+          return current_app.make_response((
+              json.dumps({"message": message,
+                          "code": code}),
+              code,
+              [("Content-Type", "application/json")]))
         except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
           err.message = ggrc_errors.BAD_REQUEST_MESSAGE

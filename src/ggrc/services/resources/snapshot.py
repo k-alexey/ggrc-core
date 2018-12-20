@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Snapshot API resource extension."""
+from collections import defaultdict
 
 from ggrc.services import common
 
@@ -34,7 +35,11 @@ class SnapshotResource(common.ExtendedResource):
     from ggrc.rbac import permissions
 
     snapshot = models.Snapshot.eager_query().get(id)
+    if not snapshot:
+      return self.not_found_response()
     if not permissions.is_allowed_read_for(snapshot):
       raise Forbidden()
-    data = [obj.log_json() for obj in snapshot.related_objects()]
+    data = defaultdict(list)
+    for obj in snapshot.related_objects():
+      data[obj.type].append(obj.log_json())
     return self.json_success_response(data, )
