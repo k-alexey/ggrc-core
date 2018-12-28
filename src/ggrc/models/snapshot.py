@@ -13,8 +13,8 @@ from sqlalchemy import event
 from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 from sqlalchemy import func
-from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import InternalServerError
+from sqlalchemy.sql.expression import tuple_, and_, or_
 from werkzeug.exceptions import Conflict
 
 from ggrc import builder
@@ -173,10 +173,26 @@ class Snapshot(WithDeleteHandable, Roleable, relationship.Relatable,
   def _check_related_objects(self):
     """Checks that Snapshot mapped only to
     Audits or Snapshots before deletion"""
+    from ggrc.models.relationship import Relationship
+
     for obj in self.related_objects():
       if obj.type not in ("Audit", "Snapshot"):
         raise Conflict(description="Snapshot should be mapped to Audit only "
                                    "before deletion")
+      elif obj.type == "Snapshot":
+        related_originals = db.session.query(Relationship.query.filter(
+            or_(and_(Relationship.source_id == obj.child_id,
+                     Relationship.source_type == obj.child_type,
+                     Relationship.destination_id == self.child_id,
+                     Relationship.destination_type == self.child_type),
+                and_(Relationship.destination_id == obj.child_id,
+                     Relationship.destination_type == obj.child_type,
+                     Relationship.source_id == self.child_id,
+                     Relationship.source_type == self.child_type)
+                )).exists()).scalar()
+        if related_originals:
+          raise Conflict(description="Snapshot should be mapped to Audit only "
+                                     "before deletion")
 
   def handle_delete(self):
     """Handle model_deleted signal for Snapshot"""
