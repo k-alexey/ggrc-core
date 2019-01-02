@@ -13,6 +13,9 @@
   GGRC.page_object = { "person": ={ full_user_json()|safe } };
   GGRC.pageType = "MY_ASSESSMENTS"
 
+-block title
+  My Assessments
+
 -block page_scripts
   %script{ type:'text/javascript', src:'{{config.get("COMMON_JS_PATH")}}' }
   %script{ type:'text/javascript', src:'{{config.get("DASHBOARD_JS_PATH")}}' }
