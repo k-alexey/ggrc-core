@@ -398,3 +398,44 @@ style=" margin-top: 0;
   font-size: 14px;
   "
 {%- endmacro %}
+
+{% macro maintenance_container() -%}
+  style=" display: block !important;
+  max-width: 600px !important;
+  margin: 20px auto !important;
+  clear: both !important;
+  "
+{%- endmacro %}
+
+{% macro maintenance_block() -%}
+  style="
+  padding: 20px;
+  background-color: #ffffff;
+  "
+{%- endmacro %}
+
+{% macro maintenance_title() -%}
+style="
+  border-bottom: 1px solid #a5a5a5;
+  padding-bottom: 20px;
+  margin: 10px 0;
+  "
+{%- endmacro %}
+
+{% macro maintenance_body() -%}
+style="
+  font-size: 13px;
+  color: #000;
+  margin: 20px 0 20px;
+"
+{%- endmacro %}
+
+{% macro maintenance_footer() -%}
+  style="
+  text-align: right;
+  font-weight: 800;
+  font-size: 16px;
+  color: #555;
+  margin: 20px;
+"
+{%- endmacro %}

@@ -14,7 +14,9 @@ from ggrc import db
 from ggrc import migrate
 from ggrc import settings
 from ggrc.models.maintenance import Maintenance
+from ggrc.models.maintenance import ChainLog
 from ggrc.models.maintenance import MigrationLog
+from ggrc.utils.maintenance_chain import jobs_status, trigger_next_job, JOBS
 
 from google.appengine.api import users
 from google.appengine.ext import deferred
@@ -36,28 +38,33 @@ def index():
   gae_user = users.get_current_user()
   if not (gae_user and gae_user.email() in settings.BOOTSTRAP_ADMIN_USERS):
     return "Unauthorized", 403
-  context = {'migration_status': 'Not started'}
+  maintenance = Maintenance.query.get(1)
+  mode = "ON" if maintenance and maintenance.under_maintenance else "OFF"
+  context = {"maintenance_mode": mode}
+  context.update(jobs_status())
+  context.update(migration_status())
+  return render_template("maintenance/trigger.html", **context)
+
+
+def migration_status():
+  """Returns dict with last migration status"""
+  result = {'migration_status': 'Not started'}
   if session.get('migration_started'):
     try:
       row = db.session.query(MigrationLog).order_by(
-          MigrationLog.id.desc()).first()
-      if not row:
-        return render_template("maintenance/trigger.html", **context)
-
-      if row.log:
-        context['migration_status'] = 'Error'
-
-      elif row.is_migration_complete:
-        context['migration_status'] = 'Complete'
-
-      else:
-        context['migration_status'] = 'In progress'
-    except sqlalchemy.exc.ProgrammingError as e:
+        MigrationLog.id.desc()).first()
+      if row:
+        if row.log:
+          result = {'migration_status': 'Error'}
+        elif row.is_migration_complete:
+          result = {'migration_status': 'Complete'}
+        else:
+          result = {'migration_status': 'In progress'}
+    except sqlalchemy.exc.ProgrammingError as err:
       if not re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""",
-                       e.message):
+                       err.message):
         raise
-
-  return render_template("maintenance/trigger.html", **context)
+  return result
 
 
 def trigger_migration():
@@ -75,7 +82,7 @@ def trigger_migration():
     if maint_row:
       maint_row.under_maintenance = True
     else:
-      maint_row = Maintenance(under_maintenance=True)
+      maint_row = Maintenance(id=1, under_maintenance=True)
       db.session.add(maint_row)
     db.session.plain_commit()
   except sqlalchemy.exc.ProgrammingError as e:
@@ -112,6 +119,37 @@ def run_migration():
   return json.dumps(data), 202
 
 
+def _turn_on_maintenance_mode():
+  """Turn off maintenance mode."""
+  db_row = db.session.query(Maintenance).get(1)
+  if not db_row:
+    db_row = Maintenance(id=1)
+  db_row.under_maintenance = True
+  db.session.add(db_row)
+  db.session.commit()
+  return redirect(url_for('index'))
+
+
+@maintenance_app.route('/maintenance/turn_on_maintenance_mode',
+                       methods=['POST'])
+def turn_on_maintenance_mode():
+  """Allow authenticated user to turn off maintenance mode."""
+  if "access_token" not in request.form:
+    gae_user = users.get_current_user()
+    if not (gae_user and
+            gae_user.email() in settings.BOOTSTRAP_ADMIN_USERS):
+      return "Unauthorized", 403
+
+    return _turn_on_maintenance_mode() or ""
+
+  if not (hasattr(settings, 'ACCESS_TOKEN') and
+          request.form.get("access_token") == settings.ACCESS_TOKEN):
+    logger.error("Invalid access token: %s", request.form.get("access_token"))
+    return "Unauthorized", 403
+
+  return _turn_on_maintenance_mode(), 202
+
+
 def _turn_off_maintenance_mode():
   """Turn off maintenance mode."""
   db_row = db.session.query(Maintenance).get(1)
@@ -119,11 +157,10 @@ def _turn_off_maintenance_mode():
     db_row.under_maintenance = False
     db.session.add(db_row)
     db.session.commit()
-    return "Maintenance mode turned off successfully"
-  return "Maintenance mode has was not turned on."
+  return redirect(url_for('index'))
 
 
-@maintenance_app.route('/maintenance/turnoff_maintenance_mode',
+@maintenance_app.route('/maintenance/turn_off_maintenance_mode',
                        methods=['POST'])
 def turn_off_maintenance_mode():
   """Allow authenticated user to turn off maintenance mode."""
@@ -169,3 +206,32 @@ def check_migration_status(row_id):
     logger.error(e.message)
     if not re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
       raise
+
+
+@maintenance_app.route('/maintenance/jobs', methods=['GET'])
+def trigger_jobs_chain():
+  """Starts post-deployment jobs chain"""
+  gae_user = users.get_current_user()
+  if not (gae_user and gae_user.email() in settings.BOOTSTRAP_ADMIN_USERS):
+    return "Unauthorized", 403
+
+  jobs = {key: "Planned" for key, value in request.values.items()
+          if key in JOBS and value.lower() == "on"}
+  maintenance = request.values.get("maintenance", "off").lower() == "on"
+  notify_email = request.values.get("notify_email", "")
+  try:
+    data = {"jobs": jobs,
+            "maintenance": maintenance,
+            "notify_email": notify_email}
+    chain = ChainLog(data=json.dumps(data))
+    db.session.add(chain)
+    db.session.commit()
+    if maintenance:
+      _turn_on_maintenance_mode()
+    trigger_next_job(chain.id)
+  except sqlalchemy.exc.ProgrammingError as error:
+    if re.search(r"\(1146, \"Table '.+' doesn't exist\"\)$", error.message):
+      return error.message, 500
+    else:
+      raise
+  return redirect(url_for('index'))

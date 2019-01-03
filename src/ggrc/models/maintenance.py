@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Models for maintenance."""
+from datetime import datetime
 
 from ggrc import db
 from ggrc.models.mixins.base import Identifiable
@@ -25,6 +26,16 @@ class MigrationLog(Identifiable, db.Model):
   version_num = db.Column(db.String)
   is_migration_complete = db.Column(db.Boolean, nullable=False, default=True)
   log = db.Column(db.String)
+
+
+class ChainLog(Identifiable, db.Model):
+  """Model holds job chains related details and logs."""
+  __tablename__ = 'chain_log'
+  created_at = db.Column(
+      db.DateTime,
+      nullable=False,
+      default=lambda: datetime.utcnow().replace(microsecond=0).isoformat())
+  data = db.Column(db.Text, nullable=False, default="{}")
 
 
 class RevisionRefreshLog(Identifiable, db.Model):

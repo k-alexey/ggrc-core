@@ -2,39 +2,60 @@
 <title>Admin maintenance dashboard</title>
 <body>
 <div style="margin-left:30%;width:500px;">
-  <div>
-    <h1>Admin maintenance dashboard</h1>
-    <hr>
+  <h1>Admin maintenance dashboard</h1>
+  <input type='button' value="Refresh page" onclick="window.location='/maintenance/index';">
+  <hr>
+  <b>Maintenance mode: {{ maintenance_mode }}</b>
+  <form action='/maintenance/turn_on_maintenance_mode' method='POST'>
+    <input type="submit" value="Turn on">
+  </form>
+  <form action='/maintenance/turn_off_maintenance_mode' method='POST'>
+    <input type="submit" value="Turn off">
+  </form>
+  <hr>
+  <div style="width: 70%;{{ chain_style }}">
+    <b>Chain operations :</b>
+    <br>created at {{ created_at }}<br>
+    <br>
+    <form action='/maintenance/jobs' method='GET'>
+      <input type="checkbox" name="maintenance" checked>In maintenance mode
+      <br>
+      <input type="checkbox" name="full_reindex">full_reindex
+      <span style="float: right">{{ full_reindex_status }}</span>
+      <br>
+      <input type="checkbox" name="reindex">reindex
+      <span style="float: right">{{ reindex_status }}</span>
+      <br>
+      <input type="checkbox" name="reindex_snapshots">reindex snapshots
+      <span style="float: right">{{ reindex_snapshots_status }}</span>
+      <br>
+      <input type="checkbox" name="compute_attributes">compute attributes
+      <span style="float: right">{{ compute_attributes_status }}</span>
+      <br>
+      <input type="checkbox" name="create_missing_revisions">create_missing_revisions
+      <span style="float: right">{{ create_missing_revisions_status }}</span>
+      <br>
+      <input type="checkbox" name="chain_migration">migration
+      <span style="float: right">{{ chain_migration_status }}</span>
+      <br>
+      <input type="checkbox" name="propagate_acl">propagate ACL
+      <span style="float: right">{{ propagate_acl_status }}</span>
+      <br>
+      <br>
+      Notify by Email: <span style="float: right"><input type="input" name="notify_email" value="{{ current_user.email }}"></span>
+      <br>
+      <br>
+      <input type="submit" value="Run jobs">
+    </form>
   </div>
-  <div>
-    <div style="float:right;">
-      <input type='button' value="Refresh page" onclick="window.location='/maintenance/index';">
-    </div>
-    <br>
-    <br>
-    <div style="float:right;">
-      <form action='/maintenance/turnoff_maintenance_mode' method='POST'>
-          <p>
-              <input type="submit" value="Turn off maintenance mode">
-          </p>
-      </form>
-    </div>
-    <br>
-    <br>
-    <br>
-    <hr>
-    <br>
-    <div>Operations :</div>
-    ---------------
-    <div>
-      <form action='/maintenance/migrate' method='POST'>
-          <p>
-              <input type="submit" value="Run migrations">  Status : {{ migration_status }}
-          </p>
-      </form>
-    </div>
-
-  </div>
+  <hr>
+  <b>Operations :</b>
+  <form action='/maintenance/migrate' method='POST'>
+    <p>
+      <input type="submit" value="Run migrations">
+      Status : {{ migration_status }}
+    </p>
+  </form>
 </div>
 
 </body>

@@ -30,6 +30,7 @@ from ggrc.rbac import permissions
 from ggrc.services import common as services_common, signals
 from ggrc.snapshotter import rules, indexer as snapshot_indexer
 from ggrc.utils import benchmark, helpers, log_event, revisions
+from ggrc.utils.maintenance_chain import chainable
 from ggrc.views import converters, cron, filters, notifications, registry, \
     utils, serializers, folder
 
@@ -37,9 +38,20 @@ logger = logging.getLogger(__name__)
 REINDEX_CHUNK_SIZE = 100
 
 
+@app.route("/_background_tasks/chain_migration", methods=["POST"])
+@background_task.queued_task
+@chainable
+def chain_migration(_):
+  """Web hook to migrate DB."""
+  from ggrc import migrate
+  migrate.migrate()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
 # Needs to be secured as we are removing @login_required
 @app.route("/_background_tasks/propagate_acl", methods=["POST"])
 @background_task.queued_task
+@chainable
 def propagate_acl(_):
   """Web hook to update revision content."""
   models.hooks.acl.propagation.propagate_all()
@@ -48,6 +60,7 @@ def propagate_acl(_):
 
 @app.route("/_background_tasks/create_missing_revisions", methods=["POST"])
 @background_task.queued_task
+@chainable
 def create_missing_revisions(_):
   """Web hook to create revisions for new objects."""
   revisions.do_missing_revisions()
@@ -56,6 +69,7 @@ def create_missing_revisions(_):
 
 @app.route("/_background_tasks/reindex_snapshots", methods=["POST"])
 @background_task.queued_task
+@chainable
 def reindex_snapshots(_):
   """Web hook to update the full text search index."""
   logger.info("Updating index for: %s", "Snapshot")
@@ -66,6 +80,7 @@ def reindex_snapshots(_):
 
 @app.route("/_background_tasks/reindex", methods=["POST"])
 @background_task.queued_task
+@chainable
 def reindex(_):
   """Web hook to update the full text search index."""
   do_reindex()
@@ -74,6 +89,7 @@ def reindex(_):
 
 @app.route("/_background_tasks/full_reindex", methods=["POST"])
 @background_task.queued_task
+@chainable
 def full_reindex(_):
   """Web hook to update the full text search index for all models."""
   do_full_reindex()
@@ -82,6 +98,7 @@ def full_reindex(_):
 
 @app.route("/_background_tasks/compute_attributes", methods=["POST"])
 @background_task.queued_task
+@chainable
 def compute_attributes(task):
   """Web hook to update the full text search index."""
   with benchmark("Run compute_attributes background task"):
@@ -740,6 +757,26 @@ def admin_propagate_acl():
       name="propagate_acl",
       url=flask.url_for(propagate_acl.__name__),
       queued_callback=propagate_acl,
+  )
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
+                         [('Content-Type', 'text/html')])))
+
+
+@app.route("/admin/chain_migration", methods=["POST"])
+@login.login_required
+@login.admin_required
+def admin_chain_migration():
+  """Migrate database job for chain execution"""
+  admins = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
+  if login.get_current_user().email not in admins:
+    raise exceptions.Forbidden()
+
+  bg_task = background_task.create_task(
+      name="chain_migration",
+      url=flask.url_for(chain_migration.__name__),
+      queued_callback=chain_migration,
   )
   db.session.commit()
   return bg_task.make_response(

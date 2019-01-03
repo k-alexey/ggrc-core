@@ -108,6 +108,7 @@ EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
 EMAIL_DAILY = JINJA2.get_template("notifications/view_daily_digest.html")
 EMAIL_PENDING = JINJA2.get_template("notifications/view_pending_digest.html")
 EMAIL_IMPORT_EXPORT = JINJA2.get_template("notifications/import_export.html")
+EMAIL_MAINTENANCE = JINJA2.get_template("notifications/maintenance.html")
 EMAIL_BULK_CHILD_SYNC_SUCCEEDED = JINJA2.get_template(
     "notifications/bulk_child_sync_succeded.html"
 )

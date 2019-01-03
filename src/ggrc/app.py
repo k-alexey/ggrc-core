@@ -88,12 +88,12 @@ def check_if_under_maintenance():
         db_row = None
       else:
         raise
-    condition = (db_row and
-                 db_row.under_maintenance and
-                 request.path != url_for('maintenance_') and
-                 request.path != '/_ah/start')
+    condition = db_row and db_row.under_maintenance
     if condition:
-      return redirect(url_for('maintenance_'))
+      whitelist = ["/maintenance_", "/_ah/start",
+                   "/admin", "/_background_tasks"]
+      if not any(request.path.startswith(item) for item in whitelist):
+        return redirect(url_for('maintenance_'))
 
 
 @app.route('/maintenance_')
@@ -237,6 +237,8 @@ def _display_request_time():
   @app.after_request
   def after_request(response):
     """Print out request time"""
+    if not hasattr(flask.g, "request_start"):
+      return response
     queries = get_debug_queries()
     query_time = sum(query.duration for query in queries)
     start_time, start_clock = flask.g.request_start
