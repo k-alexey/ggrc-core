@@ -171,8 +171,7 @@ class Snapshot(WithDeleteHandable, Roleable, relationship.Relatable,
     )
 
   def _check_related_objects(self):
-    """Checks that Snapshot mapped only to
-    Audits or Snapshots before deletion"""
+    """Checks that Snapshot mapped only to Audits before deletion"""
     from ggrc.models.relationship import Relationship
 
     for obj in self.related_objects():
