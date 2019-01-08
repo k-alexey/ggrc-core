@@ -175,6 +175,7 @@ class Snapshot(WithDeleteHandable, Roleable, relationship.Relatable,
 
     for obj in self.related_objects():
       if obj.type not in ("Audit", "Snapshot"):
+        db.session.rollback()
         raise Conflict(description="Snapshot should be mapped to Audit only "
                                    "before deletion")
       elif obj.type == "Snapshot":
@@ -189,6 +190,7 @@ class Snapshot(WithDeleteHandable, Roleable, relationship.Relatable,
                      Relationship.source_type == self.child_type)
                 )).exists()).scalar()
         if related_originals:
+          db.session.rollback()
           raise Conflict(description="Snapshot should be mapped to Audit only "
                                      "before deletion")
 
