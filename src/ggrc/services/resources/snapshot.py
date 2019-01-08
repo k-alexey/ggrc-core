@@ -49,7 +49,8 @@ class SnapshotResource(common.ExtendedResource):
             "child": _stub(child),
             "revision:": {
                 "content": {
-                    "title": obj.revision.content.get("title", "")}}
+                    "title": obj.revision.content.get("title", ""),
+                    "updated_at": obj.revision.content.get("updated_at", "")}}
         })
       data[obj.type].append(obj_data)
     return self.json_success_response(data, )
