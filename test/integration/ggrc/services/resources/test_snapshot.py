@@ -28,11 +28,13 @@ class TestSnapshotResourceDelete(TestCase):
     """Test that snapshot can be deleted only when it connected to audit"""
     # Prepare assessment with control and objective and raised issue
     control = factories.ControlFactory()
+    control_id = control.id
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
         all_models.Revision.resource_type == control.__class__.__name__
     ).order_by(all_models.Revision.id.desc()).first()
     objective = factories.ObjectiveFactory()
+    objective_id = objective.id
     revision_o = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
         all_models.Revision.resource_type == control.__class__.__name__
@@ -57,6 +59,7 @@ class TestSnapshotResourceDelete(TestCase):
       issue_id = issue.id
       factories.RelationshipFactory(source=program, destination=control)
       factories.RelationshipFactory(source=program, destination=audit)
+      factories.RelationshipFactory(source=objective, destination=control)
       factories.RelationshipFactory(source=snapshot_c, destination=audit)
       factories.RelationshipFactory(source=snapshot_o, destination=audit)
       factories.RelationshipFactory(source=assessment, destination=audit)
@@ -94,6 +97,16 @@ class TestSnapshotResourceDelete(TestCase):
     self.assertEqual(len(related_objects), 2)
     self.assertEqual(len(related_objects["Audit"]), 1)
     self.assertEqual(len(related_objects["Snapshot"]), 1)
+
+    # Check validation forbids deletion with linked Snapshot
+    resp = self.api.delete(all_models.Snapshot, snapshot_c_id)
+    self.assertEqual(resp.status_code, 409)
+
+    # Unmap original control and objective
+    control = all_models.Control.query.get(control_id)
+    objective = all_models.Objective.query.get(objective_id)
+    control_objective = Relationship.find_related(control, objective).id
+    self.api.delete(Relationship, control_objective)
 
     # Check successful deletion of control snapshot
     resp = self.api.delete(all_models.Snapshot, snapshot_c_id)
