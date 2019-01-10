@@ -1,0 +1,18 @@
+/*
+ * Copyright (C) 2018 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.snapshot-related-objects {
+  .related-to-snapshot {
+    margin-bottom: 20px;
+  }
+
+  .related-to-original {
+    .state-value.snapshot {
+      display: inline-block;
+      padding-top: 2px;
+      font-size: 13px;
+    }
+  }
+}

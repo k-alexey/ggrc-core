@@ -1,0 +1,35 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="snapshot-related-objects">
+  {{#if relatedToSnapshot.length}}
+  <div class="related-to-snapshot">
+    <p>
+      The snapshot you are trying delete has dependent object(s).
+      Please unmap the below object(s) to continue:
+    </p>
+    {{#each relatedToSnapshot}}
+      <p>
+        <a target="_blank" href="{{viewLink}}">- {{title}}</a>
+      </p>
+    {{/each}}
+  </div>
+  {{/if}}
+
+  {{#if relatedToOriginal.length}}
+  <div class="related-to-original">
+    <p>
+      The snapshot you are trying to delete has mapped snapshots.
+      Please unmap their original objects from <a target="_blank" href="{{originalObject.originalLink}}">{{originalObject.title}}</a> to continue:
+    </p>
+    {{#each relatedToOriginal}}
+      <p>
+          <a target="_blank" href="{{child.viewLink}}">- {{child.title}}</a>
+          <span class="state-value snapshot">{{un_camel_case child.type}} version as at {{dateTime revision.content.updated_at}}</span>
+      </p>
+    {{/each}}
+  </div>
+  {{/if}}
+</div>

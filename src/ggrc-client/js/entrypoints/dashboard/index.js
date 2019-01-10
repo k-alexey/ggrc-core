@@ -34,6 +34,7 @@ import '../../components/snapshotter/scope-update';
 import '../../components/page-header/page-header';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/unmap-button/unmap-button';
+import '../../components/delete-button/delete-button';
 import '../../components/related-objects/related-documents';
 import '../../components/related-objects/related-urls';
 import '../../components/inline/inline';
