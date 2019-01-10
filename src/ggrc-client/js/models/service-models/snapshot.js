@@ -20,6 +20,7 @@ export default Cacheable('CMS.Models.Snapshot', {
   },
   findAll: 'GET /api/snapshots',
   update: 'PUT /api/snapshots/{id}',
+  destroy: 'DELETE /api/snapshots/{id}',
 }, {
   display_name: function () {
     if (!this.revision) {
