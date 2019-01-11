@@ -35,7 +35,7 @@ class SnapshotResource(common.ExtendedResource):
     from ggrc import models
     from ggrc.rbac import permissions
     snapshot = models.Snapshot.query.get(id)
-    if not snapshot:
+    if snapshot is None:
       return self.not_found_response()
     if not permissions.is_allowed_read_for(snapshot):
       raise Forbidden()

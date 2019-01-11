@@ -41,7 +41,7 @@ class WithDeleteHandable(object):
     # pylint: disable=unused-variable,unused-argument
     @signals.Restful.model_deleted.connect_via(model)
     def model_delete(*args, **kwargs):
-      """PUT handler"""
+      """DELETE handler"""
       model.handle_delete(kwargs["obj"])
 
 

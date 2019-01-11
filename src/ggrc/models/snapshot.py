@@ -172,23 +172,22 @@ class Snapshot(WithDeleteHandable, Roleable, relationship.Relatable,
 
   def _check_related_objects(self):
     """Checks that Snapshot mapped only to Audits before deletion"""
-    from ggrc.models.relationship import Relationship
-
     for obj in self.related_objects():
       if obj.type not in ("Audit", "Snapshot"):
         db.session.rollback()
         raise Conflict(description="Snapshot should be mapped to Audit only "
                                    "before deletion")
       elif obj.type == "Snapshot":
-        related_originals = db.session.query(Relationship.query.filter(
-            or_(and_(Relationship.source_id == obj.child_id,
-                     Relationship.source_type == obj.child_type,
-                     Relationship.destination_id == self.child_id,
-                     Relationship.destination_type == self.child_type),
-                and_(Relationship.destination_id == obj.child_id,
-                     Relationship.destination_type == obj.child_type,
-                     Relationship.source_id == self.child_id,
-                     Relationship.source_type == self.child_type)
+        rel = relationship.Relationship
+        related_originals = db.session.query(rel.query.filter(
+            or_(and_(rel.source_id == obj.child_id,
+                     rel.source_type == obj.child_type,
+                     rel.destination_id == self.child_id,
+                     rel.destination_type == self.child_type),
+                and_(rel.destination_id == obj.child_id,
+                     rel.destination_type == obj.child_type,
+                     rel.source_id == self.child_id,
+                     rel.source_type == self.child_type)
                 )).exists()).scalar()
         if related_originals:
           db.session.rollback()
