@@ -5,7 +5,6 @@
 import sqlalchemy as sa
 
 from ggrc.models import all_models
-from ggrc.models import Relationship
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
@@ -26,7 +25,10 @@ class TestSnapshotResourceDelete(TestCase):
 
   def test_snapshot_deletion(self):
     """Test that snapshot can be deleted only when it connected to audit"""
+    # pylint: disable=too-many-locals, too-many-statements
     # Prepare assessment with control and objective and raised issue
+    rel = all_models.Relationship
+
     control = factories.ControlFactory()
     control_id = control.id
     revision = all_models.Revision.query.filter(
@@ -87,10 +89,10 @@ class TestSnapshotResourceDelete(TestCase):
     issue = all_models.Issue.query.get(issue_id)
     assessment = all_models.Assessment.query.get(assessment_id)
     snapshot_c = all_models.Snapshot.query.get(snapshot_c_id)
-    issue_snapshot = Relationship.find_related(issue, snapshot_c).id
-    asmt_snapshot = Relationship.find_related(assessment, snapshot_c).id
-    self.api.delete(Relationship, issue_snapshot)
-    self.api.delete(Relationship, asmt_snapshot)
+    issue_snapshot = rel.find_related(issue, snapshot_c).id
+    asmt_snapshot = rel.find_related(assessment, snapshot_c).id
+    self.api.delete(rel, issue_snapshot)
+    self.api.delete(rel, asmt_snapshot)
 
     # Check related_objects endpoint
     related_objects = self._get_related_objects(snapshot_c_id)
@@ -105,8 +107,8 @@ class TestSnapshotResourceDelete(TestCase):
     # Unmap original control and objective
     control = all_models.Control.query.get(control_id)
     objective = all_models.Objective.query.get(objective_id)
-    control_objective = Relationship.find_related(control, objective).id
-    self.api.delete(Relationship, control_objective)
+    control_objective = rel.find_related(control, objective).id
+    self.api.delete(rel, control_objective)
 
     # Check successful deletion of control snapshot
     resp = self.api.delete(all_models.Snapshot, snapshot_c_id)
@@ -114,13 +116,13 @@ class TestSnapshotResourceDelete(TestCase):
     self.assertFalse(all_models.Snapshot.query.get(snapshot_c_id))
 
     # Check that snapshot unmapped from all objects successfully
-    relationships = Relationship.query.filter(
+    relationships = rel.query.filter(
         sa.or_(
             sa.and_(
-                Relationship.destination_id == snapshot_c_id,
-                Relationship.destination_type == all_models.Snapshot.__name__),
+                rel.destination_id == snapshot_c_id,
+                rel.destination_type == all_models.Snapshot.__name__),
             sa.and_(
-                Relationship.source_id == snapshot_c_id,
-                Relationship.source_type == all_models.Snapshot.__name__)
+                rel.source_id == snapshot_c_id,
+                rel.source_type == all_models.Snapshot.__name__)
         )).all()
     self.assertFalse(relationships)

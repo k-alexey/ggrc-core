@@ -6,34 +6,38 @@
 import collections
 from datetime import datetime
 
+from sqlalchemy import event
+from sqlalchemy import func
+from sqlalchemy import inspect
+from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import orm
-from sqlalchemy import event
-from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
-from sqlalchemy import func
-from werkzeug.exceptions import InternalServerError
 from sqlalchemy.sql.expression import tuple_, and_, or_
 from werkzeug.exceptions import Conflict
 
 from ggrc import builder
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
-from ggrc.utils import benchmark, errors
-from ggrc.models.mixins.rest_handable import WithDeleteHandable
+from ggrc.access_control import roleable
 from ggrc.login import get_current_user_id
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import revision
-from ggrc.models.mixins import base
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
+from ggrc.models.mixins import base
+from ggrc.models.mixins import rest_handable
+from ggrc.models.mixins import with_last_assessment_date
+from ggrc.utils import benchmark
+from ggrc.utils import errors
 
 
-class Snapshot(WithDeleteHandable, Roleable, relationship.Relatable,
-               WithLastAssessmentDate, base.ContextRBAC, mixins.Base,
+class Snapshot(rest_handable.WithDeleteHandable,
+               roleable.Roleable,
+               relationship.Relatable,
+               with_last_assessment_date.WithLastAssessmentDate,
+               base.ContextRBAC,
+               mixins.Base,
                db.Model):
   """Snapshot object that holds a join of parent object, revision, child object
   and parent object's context.
@@ -368,7 +372,7 @@ def _set_latest_revisions(objects):
   for o in objects:
     o.revision_id = id_map.get((o.child_type, o.child_id))
     if o.revision_id is None:
-      raise InternalServerError(errors.MISSING_REVISION)
+      raise exceptions.InternalServerError(errors.MISSING_REVISION)
 
 
 event.listen(Session, 'before_flush', handle_post_flush)

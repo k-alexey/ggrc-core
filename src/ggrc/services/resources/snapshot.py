@@ -3,6 +3,7 @@
 
 """Snapshot API resource extension."""
 from collections import defaultdict
+from werkzeug import exceptions
 
 from ggrc.services import common
 from ggrc import utils
@@ -31,14 +32,13 @@ class SnapshotResource(common.ExtendedResource):
     """Get data for snapshot related_objects page."""
     # id name is used as a kw argument and can't be changed here
     # pylint: disable=invalid-name,redefined-builtin
-    from werkzeug.exceptions import Forbidden
     from ggrc import models
     from ggrc.rbac import permissions
     snapshot = models.Snapshot.query.get(id)
     if snapshot is None:
       return self.not_found_response()
     if not permissions.is_allowed_read_for(snapshot):
-      raise Forbidden()
+      raise exceptions.Forbidden()
 
     data = defaultdict(list)
     for obj in snapshot.related_objects():

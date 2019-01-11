@@ -3,7 +3,7 @@
 
 """All GGRC REST services."""
 
-from ggrc.services.common import ReadOnlyResource
+from ggrc.services import common
 from ggrc.services.registry import service
 
 
@@ -12,20 +12,20 @@ def contributed_services():
   (url, ModelClass) tuples.
   """
   import ggrc.models.all_models as models
-  from ggrc.services.resources.relationship import RelationshipResource
-  from ggrc.services.resources.audit import AuditResource
-  from ggrc.services.resources.assessment import AssessmentResource
-  from ggrc.services.resources.person import PersonResource
-  from ggrc.services.resources.snapshot import SnapshotResource
-  from ggrc.services.resources.issue import IssueResource
-  from ggrc.services.resources import related_assessments
-  from ggrc.access_control.role import AccessControlRole
+  from ggrc.access_control import role
   from ggrc.models import review
+  from ggrc.services.resources import assessment
+  from ggrc.services.resources import audit
+  from ggrc.services.resources import issue
+  from ggrc.services.resources import person
+  from ggrc.services.resources import related_assessments
+  from ggrc.services.resources import relationship
+  from ggrc.services.resources import snapshot
 
   return [
       service('background_tasks', models.BackgroundTask),
       service('access_groups', models.AccessGroup),
-      service('audits', models.Audit, AuditResource),
+      service('audits', models.Audit, audit.AuditResource),
       service('calendar_events', models.CalendarEvent),
       service('categorizations', models.Categorization),
       service('category_bases', models.CategoryBase),
@@ -33,21 +33,21 @@ def contributed_services():
       service('control_assertions', models.ControlAssertion),
       service('contexts', models.Context),
       service('controls', models.Control),
-      service('assessments', models.Assessment, AssessmentResource),
+      service('assessments', models.Assessment, assessment.AssessmentResource),
       service('assessment_templates', models.AssessmentTemplate),
       service('comments', models.Comment),
       service('custom_attribute_definitions',
               models.CustomAttributeDefinition),
       service('custom_attribute_values', models.CustomAttributeValue),
       service('data_assets', models.DataAsset),
-      service('directives', models.Directive, ReadOnlyResource),
+      service('directives', models.Directive, common.ReadOnlyResource),
       service('contracts', models.Contract),
       service('evidence', models.Evidence),
       service('policies', models.Policy),
       service('regulations', models.Regulation),
       service('standards', models.Standard),
       service('documents', models.Document),
-      service('events', models.Event, ReadOnlyResource),
+      service('events', models.Event, common.ReadOnlyResource),
       service('facilities', models.Facility),
       service('markets', models.Market),
       service('object_people', models.ObjectPerson),
@@ -55,26 +55,29 @@ def contributed_services():
       service('options', models.Option),
       service('org_groups', models.OrgGroup),
       service('vendors', models.Vendor),
-      service('people', models.Person, PersonResource),
+      service('people', models.Person, person.PersonResource),
       service('people_profiles', models.PersonProfile),
       service('products', models.Product),
       service('projects', models.Project),
       service('programs', models.Program),
-      service('relationships', models.Relationship, RelationshipResource),
-      service('revisions', models.Revision, ReadOnlyResource),
+      service('relationships',
+              models.Relationship,
+              relationship.RelationshipResource),
+      service('revisions', models.Revision, common.ReadOnlyResource),
       service('requirements', models.Requirement),
       service('risk_assessments', models.RiskAssessment),
       service('risks', models.Risk),
       service('threats', models.Threat),
-      service(
-          'systems_or_processes', models.SystemOrProcess, ReadOnlyResource),
+      service('systems_or_processes',
+              models.SystemOrProcess,
+              common.ReadOnlyResource),
       service('systems', models.System),
       service('processes', models.Process),
       service('metrics', models.Metric),
       service('notification_configs', models.NotificationConfig),
-      service('issues', models.Issue, IssueResource),
-      service('snapshots', models.Snapshot, SnapshotResource),
-      service('access_control_roles', AccessControlRole),
+      service('issues', models.Issue, issue.IssueResource),
+      service('snapshots', models.Snapshot, snapshot.SnapshotResource),
+      service('access_control_roles', role.AccessControlRole),
       service('labels', models.Label),
       service('proposals', models.Proposal),
       service('related_assessments', None,
