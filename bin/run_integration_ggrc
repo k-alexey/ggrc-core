@@ -12,7 +12,7 @@ export GGRC_TEST_DB="test_ggrc"
 db_reset -d "$GGRC_TEST_DB"
 
 echo -e "\nRunning integration ggrc tests"
-nosetests integration \
+nosetests integration/ggrc/services/test_query/test_snapshots.py \
   -e "^access_control$" \
   -e "^ggrc_basic_permissions$" \
   -e "^ggrc_gdrive_integration$" \
