@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import tuple_, and_, or_
-from werkzeug.exceptions import Conflict
+from werkzeug import exceptions
 
 from ggrc import builder
 from ggrc import db
@@ -179,8 +179,8 @@ class Snapshot(rest_handable.WithDeleteHandable,
     for obj in self.related_objects():
       if obj.type not in ("Audit", "Snapshot"):
         db.session.rollback()
-        raise Conflict(description="Snapshot should be mapped to Audit only "
-                                   "before deletion")
+        raise exceptions.Conflict(description="Snapshot should be mapped "
+                                              "to Audit only before deletion")
       elif obj.type == "Snapshot":
         rel = relationship.Relationship
         related_originals = db.session.query(rel.query.filter(
@@ -195,8 +195,8 @@ class Snapshot(rest_handable.WithDeleteHandable,
                 )).exists()).scalar()
         if related_originals:
           db.session.rollback()
-          raise Conflict(description="Snapshot should be mapped to Audit only "
-                                     "before deletion")
+          raise exceptions.Conflict(description="Snapshot should be mapped to "
+                                                "Audit only before deletion")
 
   def handle_delete(self):
     """Handle model_deleted signal for Snapshot"""

@@ -452,7 +452,7 @@ class Resource(ModelView):
           message = translate_message(err)
           raise BadRequest(message)
         except HTTPException as error:
-          message = error.description or ""
+          message = error.description or ggrc_errors.BAD_REQUEST_MESSAGE
           code = error.code or 500
           return current_app.make_response((
               json.dumps({"message": message,
@@ -580,6 +580,7 @@ class Resource(ModelView):
 
   @utils.validate_mimetype("application/json")
   def put(self, id):  # pylint: disable=redefined-builtin
+    """PUT operation handler."""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -675,6 +676,7 @@ class Resource(ModelView):
       flask.g.referenced_object_stubs = {obj.type: {obj.id}}
 
   def delete(self, id):  # pylint: disable=redefined-builtin
+    """DELETE operation handler."""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
