@@ -74,16 +74,29 @@ def trigger_next_job(chain_id):
   else:
     if maintenance:
       _turn_off_maintenance_mode()
+    change_chain_status(chain_id, "Finished")
     send_notification(chain_id)
 
 
 def change_job_status(chain_id, job, status):
-  """Change status on job in ChainLog model"""
+  """Change status of job in ChainLog model"""
   from ggrc.models.maintenance import ChainLog
   db.session.rollback()
   chain = db.session.query(ChainLog).get(chain_id)
   data = json.loads(chain.data)
   data["jobs"][job] = status
+  chain.data = json.dumps(data)
+  db.session.add(chain)
+  db.session.commit()
+
+
+def change_chain_status(chain_id, status):
+  """Change status of chain in ChainLog model"""
+  from ggrc.models.maintenance import ChainLog
+  db.session.rollback()
+  chain = db.session.query(ChainLog).get(chain_id)
+  data = json.loads(chain.data)
+  data["status"] = status
   chain.data = json.dumps(data)
   db.session.add(chain)
   db.session.commit()
@@ -96,13 +109,14 @@ def send_notification(chain_id):
     data = json.loads(chain.data)
     if not data["notify_email"]:
       return
+    title = "{} deployment status".format(settings.APPENGINE_INSTANCE)
     msg = {
-        "title": "Deployment status",
+        "title": title,
         "body": "<br>".join(
             "{}: {}".format(k, v) for k, v in data["jobs"].items())
     }
     body = settings.EMAIL_MAINTENANCE.render(maintenance=msg)
-    send_email(data["notify_email"], "Deployment status", body)
+    send_email(data["notify_email"], title, body)
   except:  # pylint: disable=bare-except
     logger.exception("Failed on sending notification")
 
@@ -124,6 +138,7 @@ def chainable(func):
       if chain_id:
         change_job_status(chain_id, job, "Failed:{}".format(repr(err)))
         send_notification(chain_id)
+        change_chain_status(chain_id, "Failed")
       raise
     if chain_id:
       change_job_status(chain_id, job, "Finished")

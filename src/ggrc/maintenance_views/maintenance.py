@@ -32,9 +32,20 @@ import sqlalchemy
 logger = getLogger(__name__)
 
 
+def login_app():
+  """Login into main app"""
+  import flask_login
+  from ggrc.login import get_login_module
+  login_module = get_login_module()
+  user = login_module.get_user()
+  if user.system_wide_role != 'No Access':
+    flask_login.login_user(user)
+
+
 @maintenance_app.route('/maintenance/index')
 def index():
   """Renders admin maintenance dashboard."""
+  login_app()
   gae_user = users.get_current_user()
   if not (gae_user and gae_user.email() in settings.BOOTSTRAP_ADMIN_USERS):
     return "Unauthorized", 403
@@ -211,6 +222,7 @@ def check_migration_status(row_id):
 @maintenance_app.route('/maintenance/jobs', methods=['GET'])
 def trigger_jobs_chain():
   """Starts post-deployment jobs chain"""
+  login_app()
   gae_user = users.get_current_user()
   if not (gae_user and gae_user.email() in settings.BOOTSTRAP_ADMIN_USERS):
     return "Unauthorized", 403
@@ -222,7 +234,8 @@ def trigger_jobs_chain():
   try:
     data = {"jobs": jobs,
             "maintenance": maintenance,
-            "notify_email": notify_email}
+            "notify_email": notify_email,
+            "status": "Not Finished"}
     chain = ChainLog(data=json.dumps(data))
     db.session.add(chain)
     db.session.commit()
@@ -235,3 +248,13 @@ def trigger_jobs_chain():
     else:
       raise
   return redirect(url_for('index'))
+
+
+@maintenance_app.route('/maintenance/chain_status')
+def get_chain_status():
+  """Return status of last chain"""
+  chain = db.session.query(ChainLog).order_by(
+      ChainLog.id.desc()).limit(1).first()
+  data = json.loads(chain.data)
+  return maintenance_app.make_response(
+      (data.get("status", "None"), 200, [("Content-Type", "text/html")]))
