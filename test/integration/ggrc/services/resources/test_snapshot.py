@@ -23,8 +23,22 @@ class TestSnapshotResourceDelete(services.TestCase):
     url = "/api/snapshots/{}/related_objects".format(snapshot_id)
     return self.client.get(url).json
 
+  def check_no_relationship(self, snapshot_c_id):
+    """Check that snapshot have no relationships"""
+    rel = all_models.Relationship
+    relationships = rel.query.filter(
+        sa.or_(
+            sa.and_(
+                rel.destination_id == snapshot_c_id,
+                rel.destination_type == all_models.Snapshot.__name__),
+            sa.and_(
+                rel.source_id == snapshot_c_id,
+                rel.source_type == all_models.Snapshot.__name__)
+        )).all()
+    self.assertFalse(relationships)
+
   def test_snapshot_del_w_asmt(self):
-    """Test that snapshot can be deleted only when it connected to audit"""
+    """Test validation of deletion of snapshot with mapped assessment, issue"""
     # pylint: disable=too-many-locals, too-many-statements
     # Prepare assessment with control and objective and raised issue
     rel = all_models.Relationship
@@ -87,19 +101,10 @@ class TestSnapshotResourceDelete(services.TestCase):
     self.assertFalse(all_models.Snapshot.query.get(snapshot_c_id))
 
     # Check that snapshot unmapped from all objects successfully
-    relationships = rel.query.filter(
-        sa.or_(
-            sa.and_(
-                rel.destination_id == snapshot_c_id,
-                rel.destination_type == all_models.Snapshot.__name__),
-            sa.and_(
-                rel.source_id == snapshot_c_id,
-                rel.source_type == all_models.Snapshot.__name__)
-        )).all()
-    self.assertFalse(relationships)
+    self.check_no_relationship(snapshot_c_id)
 
   def test_snapshot_del_w_snapshot(self):
-    """Test that snapshot can be deleted only when it connected to audit"""
+    """Test validation of deletion of snapshot mapped to another snapshot"""
     # pylint: disable=too-many-locals, too-many-statements
     # Prepare assessment with control and objective and raised issue
     rel = all_models.Relationship
@@ -159,13 +164,4 @@ class TestSnapshotResourceDelete(services.TestCase):
     self.assertFalse(all_models.Snapshot.query.get(snapshot_c_id))
 
     # Check that snapshot unmapped from all objects successfully
-    relationships = rel.query.filter(
-        sa.or_(
-            sa.and_(
-                rel.destination_id == snapshot_c_id,
-                rel.destination_type == all_models.Snapshot.__name__),
-            sa.and_(
-                rel.source_id == snapshot_c_id,
-                rel.source_type == all_models.Snapshot.__name__)
-        )).all()
-    self.assertFalse(relationships)
+    self.check_no_relationship(snapshot_c_id)
