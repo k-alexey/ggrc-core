@@ -104,7 +104,9 @@ class Roleable(object):
     """
     if values is None:
       return
-
+    for value in values:
+      referenced_objects.mark_to_cache("Person", value["person"]["id"])
+    referenced_objects.rewarm_cache(skip_cad=True, undefer=True)
     new_acl_people_map = defaultdict(set)
     for value in values:
       if value["ac_role_id"] not in self.acr_id_acl_map:

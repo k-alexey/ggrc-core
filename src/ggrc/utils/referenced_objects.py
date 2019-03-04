@@ -43,7 +43,7 @@ def mark_to_cache(type_, id_):
     flask.g.referenced_objects_markers[type_].add(id_)
 
 
-def rewarm_cache():
+def rewarm_cache(skip_cad=False, undefer=False):
   """Rewarm cache on call."""
   if not hasattr(flask.g, "referenced_objects_markers"):
     return
@@ -55,7 +55,12 @@ def rewarm_cache():
     if type_ not in flask.g.referenced_objects:
       flask.g.referenced_objects[type_] = {}
     query = type_.query.filter(type_.id.in_(ids))
-    if issubclass(type_, customattributable.CustomAttributable):
+    if undefer:
+      query = query.options(
+          orm.Load(type_).undefer_group(type_.__name__ + "_complete")
+      )
+    if (issubclass(type_, customattributable.CustomAttributable)
+            and not skip_cad):
       query = query.options(
           orm.Load(type_).subqueryload(
               "custom_attribute_definitions"
