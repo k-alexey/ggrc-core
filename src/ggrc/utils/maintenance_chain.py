@@ -109,7 +109,7 @@ def send_notification(chain_id):
     data = json.loads(chain.data)
     if not data["notify_email"]:
       return
-    title = "{} deployment status".format(settings.APPENGINE_INSTANCE)
+    title = "{} deployment jobs report".format(settings.APPENGINE_INSTANCE)
     msg = {
         "title": title,
         "body": "<br>".join(
