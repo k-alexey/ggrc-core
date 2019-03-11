@@ -22,6 +22,7 @@ from ggrc.builder import json as builder_json
 from ggrc.cache import utils as cache_utils
 from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
+from ggrc.maintenance_views.maintenance import chainable
 from ggrc.models import background_task, reflection, revision
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
@@ -30,7 +31,6 @@ from ggrc.rbac import permissions
 from ggrc.services import common as services_common, signals
 from ggrc.snapshotter import rules, indexer as snapshot_indexer
 from ggrc.utils import benchmark, helpers, log_event, revisions
-from ggrc.utils.maintenance_chain import chainable
 from ggrc.views import converters, cron, filters, notifications, registry, \
     utils, serializers, folder
 
