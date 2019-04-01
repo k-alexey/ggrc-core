@@ -7,16 +7,18 @@ cd "${SCRIPTPATH}/../test"
 
 source "${SCRIPTPATH}/init_test_env"
 
-export GGRC_TEST_DB="test_ggrc"
+PROCESSES=8
 
-db_reset -d "$GGRC_TEST_DB"
+find ./integration/ -name "test_*.py" > testfiles
+for ((i=1;i<=PROCESSES;i++))
+do
+GGRC_TEST_DB="ggrcdevtest_$i" db_reset -d "ggrcdevtest_$i"
+done
 
-echo -e "\nRunning integration ggrc tests"
-nosetests integration \
-  -e "^access_control$" \
-  -e "^ggrc_basic_permissions$" \
-  -e "^ggrc_gdrive_integration$" \
-  -e "^ggrc_workflows$" \
-  --with-xunit \
-  --logging-clear-handlers \
-  ${@:1}
+echo -e "\nRunning integration tests"
+for ((i=1;i<=PROCESSES;i++))
+do
+$(split -n l/$i/$PROCESSES testfiles | tr '\n' ' ' | GGRC_TEST_DB="ggrcdevtest_$i" xargs nosetests)&
+done
+rm testfiles
+wait

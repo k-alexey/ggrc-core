@@ -7,12 +7,21 @@ cd "${SCRIPTPATH}/../test"
 
 source "${SCRIPTPATH}/init_test_env"
 
-export GGRC_TEST_DB="test_acl"
+PROCESSES=4
 
-db_reset -d "$GGRC_TEST_DB"
+find ./integration/ggrc/access_control/ -name "test_*.py" > ~/testfiles
+for ((i=1;i<=PROCESSES;i++))
+do
+echo 1
+# GGRC_TEST_DB="ggrcdevtest_$i" db_reset -d "ggrcdevtest_$i"
+done
 
-echo -e "\nRunning access control integration tests"
-nosetests integration.ggrc.access_control \
-  --with-xunit \
-  --logging-clear-handlers \
-  ${@:1}
+cat ~/testfiles
+
+echo -e "\nRunning integration tests"
+for ((i=1;i<=PROCESSES;i++))
+do
+$(split -n l/$i/$PROCESSES ~/testfiles)&
+done
+rm ~/testfiles
+wait
