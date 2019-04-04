@@ -18,7 +18,7 @@ done
 echo -e "\nRunning integration tests"
 for ((i=1;i<=PROCESSES;i++))
 do
-$(split -n l/$i/$PROCESSES testfiles | tr '\n' ' ' | GGRC_TEST_DB="ggrcdevtest_$i" xargs nosetests)&
+(split -n l/$i/$PROCESSES testfiles | tr '\n' ' ' | GGRC_TEST_DB=ggrcdevtest_$i xargs nosetests)&
 done
 rm testfiles
 wait

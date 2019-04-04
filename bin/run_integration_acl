@@ -12,8 +12,7 @@ PROCESSES=4
 find ./integration/ggrc/access_control/ -name "test_*.py" > ~/testfiles
 for ((i=1;i<=PROCESSES;i++))
 do
-echo 1
-# GGRC_TEST_DB="ggrcdevtest_$i" db_reset -d "ggrcdevtest_$i"
+GGRC_TEST_DB="ggrcdevtest_$i" db_reset -d "ggrcdevtest_$i"
 done
 
 cat ~/testfiles
@@ -21,7 +20,7 @@ cat ~/testfiles
 echo -e "\nRunning integration tests"
 for ((i=1;i<=PROCESSES;i++))
 do
-$(split -n l/$i/$PROCESSES ~/testfiles)&
+(split -n l/$i/$PROCESSES testfiles | tr '\n' ' ' | GGRC_TEST_DB=ggrcdevtest_$i xargs nosetests)&
 done
 rm ~/testfiles
 wait
