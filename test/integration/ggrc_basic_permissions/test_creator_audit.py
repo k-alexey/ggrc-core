@@ -192,6 +192,7 @@ class TestCreatorAudit(TestCase):
           "issue": {
               "title": random_title,
               "context": None,
+              "due_date": "10/10/2019"
           },
       })
       self.assertEqual(response.status_code, 201)

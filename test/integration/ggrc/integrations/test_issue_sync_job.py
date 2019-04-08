@@ -203,7 +203,7 @@ class TestIssueIntegration(ggrc.TestCase):
     self.assertEquals(issue1.due_date.strftime(date_format), due_date)
 
     issue2 = all_models.Issue.query.get(iti2.issue_tracked_obj.id)
-    self.assertIsNone(issue2.due_date)
+    self.assertNotEqual(issue2.due_date.strftime(date_format), due_date)
 
   def test_sync_issue_tracker_emails(self):
     """Test sync issue tracker emails.

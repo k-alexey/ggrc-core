@@ -34,7 +34,8 @@ def _create_obj_dict(obj, audit_id, context_id, assessment_id=None):
           "audit": {
               "id": audit_id,
               "type": "Audit"
-          }
+          },
+          "due_date": "10/10/2019"
       },
       "assessment": {
           "title": "Assessment Title",

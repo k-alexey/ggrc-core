@@ -68,6 +68,7 @@ class TestIssueIntegration(ggrc.TestCase):
         "title": payload_attrs["title"],
         "context": payload_attrs["context"],
         "status": payload_attrs["status"],
+        "due_date": "10/10/2019",
         "issue_tracker": {
             "enabled": payload_attrs["enabled"],
             "component_id": payload_attrs["component_id"],
@@ -184,7 +185,8 @@ class TestIssueIntegration(ggrc.TestCase):
                   "issue_type": issue_type,
                   "issue_priority": issue_priority,
                   "issue_severity": issue_severity,
-              }
+              },
+              "due_date": "10/10/2019"
           },
       })
       mock_create_issue.assert_called_once()
@@ -650,7 +652,8 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
               "context": None,
               "issue_tracker": {
                   "enabled": False,
-              }
+              },
+              "due_date": "10/10/2019"
           },
       })
     mock_create_issue.assert_not_called()
@@ -734,7 +737,8 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
           "issue": {
               "title": title,
               "context": None,
-              "issue_tracker": issue_tracker_attrs
+              "issue_tracker": issue_tracker_attrs,
+              "due_date": "10/10/2019"
           },
       })
 

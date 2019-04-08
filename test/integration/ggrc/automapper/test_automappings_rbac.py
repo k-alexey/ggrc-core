@@ -93,6 +93,7 @@ class TestAutomappings(TestCase):
         },
         "title": "aa",
         "context": None,
+        "due_date": "10/10/2019"
     }
     if extra_data is not None:
       issue_data.update(extra_data)

@@ -15,6 +15,7 @@ use the object generator in the ggrc.generator module.
 import sys
 import random
 import string
+import datetime
 from contextlib import contextmanager
 
 import factory
@@ -148,6 +149,8 @@ class IssueFactory(TitledFactory):
 
   class Meta:
     model = all_models.Issue
+
+  due_date = factory.LazyFunction(datetime.datetime.utcnow)
 
 
 class IssueTrackerIssueFactory(TitledFactory):
