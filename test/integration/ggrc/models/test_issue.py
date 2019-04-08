@@ -93,6 +93,13 @@ class TestIssueDueDate(TestCase):
     self.assert200(response)
     self.assertEqual(response.json["issue"]["due_date"], "2018-06-15")
 
+  def test_issue_due_date_mandatory(self):
+    """Test Issue.due_date is mandatory field"""
+    response = self.api.post(all_models.Issue,
+                             data={"issue": {"title": "TestDueDate",
+                                             "context": None}})
+    self.assertEqual(400, response.status_code)
+
 
 class TestIssueAuditMapping(TestCase):
   """Test suite to check the rules for Issue-Audit mappings."""
@@ -159,7 +166,8 @@ class TestIssueAuditMapping(TestCase):
     """Issue isn't mapped to Audit by POSTing with audit field."""
     response, issue = self.generator.generate_object(
         all_models.Issue,
-        {"audit": {"type": "Audit", "id": self.audit.id}},
+        {"audit": {"type": "Audit", "id": self.audit.id},
+         "due_date": "06/14/2018"},
     )
     self.assertStatus(response, 201)
     rel = all_models.Relationship
