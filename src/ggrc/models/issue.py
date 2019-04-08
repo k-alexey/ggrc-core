@@ -148,3 +148,10 @@ class Issue(Roleable,
     kwargs['load_related'] = True
 
     return cls._populate_query(super(Issue, cls).eager_query(**kwargs))
+
+  @orm.validates("due_date")
+  def validate_due_date(self, _, value):  # pylint: disable=no-self-use
+    """Validate due date"""
+    if not value:
+      raise ValueError("Due Date for the issue is not specified")
+    return value
