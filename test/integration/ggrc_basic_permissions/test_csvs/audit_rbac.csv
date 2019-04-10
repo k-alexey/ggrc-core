@@ -47,6 +47,6 @@ Objective,Code*,Title*,Admin*,State,map:program,
 ,PMRBACOBJECTIVE-1,Program Manager Audit RBAC Test,user@example.com,Draft,PMRBACPROGRAM-1,
 ,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,
-Issue,Code*,Title*,Admin*,State,Map:Audit,
-,PMRBACISSUE-1,Program Manager Audit RBAC Test,user@example.com,Draft,AUDIT-1,
-,PMRBACISSUE-2,Program Manager Audit RBAC Test Archived,user@example.com,Draft,AUDIT-2,
+Issue,Code*,Title*,Admin*,State,Map:Audit,Due Date
+,PMRBACISSUE-1,Program Manager Audit RBAC Test,user@example.com,Draft,AUDIT-1,10/10/2019
+,PMRBACISSUE-2,Program Manager Audit RBAC Test Archived,user@example.com,Draft,AUDIT-2,10/10/2019

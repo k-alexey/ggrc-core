@@ -103,6 +103,9 @@ class TestExternalPermissions(TestCase):
       model_data["review_status"] = all_models.Review.STATES.UNREVIEWED
       model_data["review_status_display_name"] = "some status"
 
+    if model_plural == "issues":
+      model_data["due_date"] = "10/10/2019"
+
     response = self._post(
         "api/{}".format(model_plural),
         data=json.dumps({

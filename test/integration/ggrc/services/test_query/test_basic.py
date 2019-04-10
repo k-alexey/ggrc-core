@@ -747,8 +747,8 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
   @ddt.data(
       (all_models.Control, [all_models.Objective, all_models.Control,
                             all_models.Market, all_models.Objective]),
-      (all_models.Issue, [all_models.Control, all_models.Control,
-                          all_models.Market, all_models.Objective]),
+      (all_models.Comment, [all_models.Control, all_models.Control,
+                            all_models.Market, all_models.Objective]),
   )
   @ddt.unpack
   def test_search_relevant_to_type(self, base_type, relevant_types):
@@ -842,6 +842,9 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
     """Test filter with 'relevant to' conditions (Audit scope)."""
     audit = factories.AuditFactory()
     audit_data = {"audit": {"id": audit.id}}
+
+    if base_type == all_models.Issue or all_models.Issue in relevant_types:
+      audit_data["due_date"] = "10/10/2019"
 
     _, base_obj = self.generator.generate_object(base_type, audit_data)
     relevant_objects = []

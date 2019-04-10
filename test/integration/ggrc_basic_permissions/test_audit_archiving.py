@@ -322,6 +322,8 @@ class TestArchivedAudit(TestAuditArchivingBase):
       json = {
           "title": title
       }
+      if obj == "issue":
+        json["due_date"] = "10/10/2019"
       response = self.api.put(obj_instance, json)
       assert response.status_code == status, \
           "{} put returned {} instead of {} for {}".format(
