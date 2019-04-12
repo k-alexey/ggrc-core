@@ -10,7 +10,6 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     curl \
     fabric \
     git-core \
-    google-chrome-stable \
     graphviz \
     libfontconfig \
     make \
@@ -26,6 +25,8 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     wget \
     zip \
     pv \
+  && apt-get install -y --allow-unauthenticated \
+    google-chrome-stable \
   && rm -rf /var/lib/apt/lists/*
 
 COPY ./provision/docker/my.cnf /root/.my.cnf
