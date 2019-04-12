@@ -85,6 +85,7 @@ export default Cacheable.extend({
       this._super(...arguments);
     }
     this.validateNonBlank('title');
+    this.validateNonBlank('due_date');
 
     this.validate(
       'issue_tracker_component_id',
