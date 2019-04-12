@@ -355,28 +355,6 @@ select.input-block-level {
   justify-content: space-between;
 }
 
-// input error
-.field-failure {
-  input {
-    @include placeholder($lightRed);
-    border: 1px solid $red;
-  }
-  label {
-    color: $red;
-  }
-  select {
-    border: 1px solid $red;
-  }
-  .help-inline {
-    margin: -8px 0 8px 0;
-    display: block;
-    font-size: $f-small;
-    font-weight: bold;
-    color: $red;
-    padding: 0;
-  }
-}
-
 // Left dropdown positioning
 .left-dropdown {
   .dropdown-menu {
