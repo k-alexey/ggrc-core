@@ -356,6 +356,10 @@ class DateColumnHandler(ColumnHandler):
       )
       return
     value = self.raw_value
+    if self.mandatory and not value:
+      self.add_error(
+          errors.MISSING_COLUMN, s="", column_names=self.display_name
+      )
     if value and not re.match(
         r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
         r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}", self.raw_value
@@ -377,9 +381,8 @@ class DateColumnHandler(ColumnHandler):
         self.check_last_asmnt_date(parsed_value)
       if type(getattr(self.row_converter.obj, self.key, None)) is date:
         return parsed_value.date()
-      else:
-        return parsed_value
-    except:
+      return parsed_value
+    except:  # pylint: disable=bare-except
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
   def _check_errors_non_importable_objects(self, object_date, import_date):

@@ -69,7 +69,8 @@ class Issue(Roleable,
 
   _aliases = {
       "due_date": {
-          "display_name": "Due Date"
+          "display_name": "Due Date",
+          "mandatory": True,
       },
       "test_plan": {
           "display_name": "Remediation Plan"
