@@ -562,7 +562,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "mandatory": {
             "Title",
             "Admin",
-            "Code"
+            "Code",
+            "Due Date"
         },
         "unique": {
             "Code",

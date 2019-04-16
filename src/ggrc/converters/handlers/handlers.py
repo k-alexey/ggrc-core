@@ -356,10 +356,6 @@ class DateColumnHandler(ColumnHandler):
       )
       return
     value = self.raw_value
-    if self.mandatory and not value:
-      self.add_error(
-          errors.MISSING_COLUMN, s="", column_names=self.display_name
-      )
     if value and not re.match(
         r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
         r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}", self.raw_value

@@ -10,7 +10,7 @@ person,Name,Email,Company,role,,,,,,,,,,
 ,Second User,user2@ggrc.com,google,reader,,,,,,,,,,
 ,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,
-issue,Title,Description,Notes,Remediation Plan,Admin,Reference URL,Code,Effective Date,State,,,,,
+issue,Title,Description,Notes,Remediation Plan,Admin,Reference URL,Code,Effective Date,State,Due Date*,,,,
 ,Corporate ipsum - 1.2.5,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -19,7 +19,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",Urbon.S@example.com,http://i.imgur.com/glrQUla.jpg,issue-111,11/20/2015,Draft,,,,,
+really all",Urbon.S@example.com,http://i.imgur.com/glrQUla.jpg,issue-111,11/20/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.6,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -28,7 +28,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",Urbon.S@example.com,http://i.imgur.com/glrQUla.jpg,issue-112,11/21/2015,Draft,,,,,
+really all",Urbon.S@example.com,http://i.imgur.com/glrQUla.jpg,issue-112,11/21/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.7,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -37,7 +37,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-113,11/22/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-113,11/22/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.8,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -46,7 +46,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-114,11/23/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-114,11/23/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.9,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -55,7 +55,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-115,11/24/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-115,11/24/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.10,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -64,7 +64,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-116,11/25/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-116,11/25/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.11,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -73,7 +73,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-117,11/26/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-117,11/26/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.12,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -82,7 +82,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-118,11/27/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-118,11/27/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.13,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -91,7 +91,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-119,11/28/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-119,11/28/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.14,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -100,7 +100,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-120,11/29/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-120,11/29/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.15,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -109,7 +109,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-121,11/30/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-121,11/30/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.16,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -118,7 +118,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-122,12/1/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-122,12/1/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.17,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -127,7 +127,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-123,12/2/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-123,12/2/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.18,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -136,7 +136,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-124,12/3/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-124,12/3/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.19,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -145,7 +145,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-125,12/4/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-125,12/4/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.20,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -154,7 +154,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-126,12/5/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-126,12/5/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.21,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -163,7 +163,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-127,12/6/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-127,12/6/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.22,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -172,7 +172,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-128,12/7/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-128,12/7/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.23,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -181,7 +181,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-129,12/8/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-129,12/8/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.24,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -190,7 +190,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-130,12/9/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-130,12/9/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.25,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -199,7 +199,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-131,12/10/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-131,12/10/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.26,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -208,7 +208,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-132,12/11/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-132,12/11/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.27,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -217,7 +217,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-133,12/12/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-133,12/12/2015,Draft,11/20/2015,,,,
 ,Corporate ipsum - 1.2.28,"Collaboratively administrate empowered markets via plug-and-play networks. Dynamically procrastinate B2C users after installed base benefits. Dramatically visualize customer directed convergence without revolutionary ROI.<br>
 <br>
 Efficiently unleash cross-media information without cross-media value. Quickly maximize timely deliverables for real-time schemas. Dramatically maintain clicks-and-mortar solutions without functional solutions.<br>
@@ -226,7 +226,7 @@ Completely synergize resource sucking relationships via premier niche markets. P
 
 Lol.",no notes here,"Do all the things
 
-really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-134,12/13/2015,Draft,,,,,
+really all",zidar@example.com,http://i.imgur.com/glrQUla.jpg,issue-134,12/13/2015,Draft,11/20/2015,,,,
 ,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,
 regulation,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,,,,,

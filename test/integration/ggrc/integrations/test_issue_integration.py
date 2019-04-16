@@ -45,6 +45,7 @@ class TestIssueIntegration(ggrc.TestCase):
       "issue_type": "Default Issue Type",
       "issue_priority": "P2",
       "issue_severity": "S1",
+      "due_date": "05/16/2018"
   }
 
   DEFAULT_TICKET_ATTRS = {
@@ -68,7 +69,7 @@ class TestIssueIntegration(ggrc.TestCase):
         "title": payload_attrs["title"],
         "context": payload_attrs["context"],
         "status": payload_attrs["status"],
-        "due_date": "10/10/2019",
+        "due_date": payload_attrs["due_date"],
         "issue_tracker": {
             "enabled": payload_attrs["enabled"],
             "component_id": payload_attrs["component_id"],
@@ -568,6 +569,7 @@ class TestIssueLink(TestIssueIntegration):
       with mock.patch.object(integration_utils, "exclude_auditor_emails",
                              return_value={u"user@example.com", }):
         response = self.api.post(all_models.Issue, issue_request_payload)
+        print response
       get_mock.assert_called_once()
     update_mock.assert_called_once()
 

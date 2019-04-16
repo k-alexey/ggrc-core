@@ -333,8 +333,8 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
         ("task type", "Rich Text"),
         ("task group", self.task_group.slug),
         ("summary", "Task group test task 1"),
-        ("start date", start_date),
-        ("end date", end_date),
+        ("start date*", start_date),
+        ("end date*", end_date),
         ("task assignees", self.person.email),
     ])
     response = self.import_data(tgt_import_data)

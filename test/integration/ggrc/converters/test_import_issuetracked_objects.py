@@ -178,6 +178,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Admin", "user@example.com"),
         ("Title", "Object Title"),
         ("Ticket Tracker Integration", value),
+        ("Due Date*", "2016-10-24T15:35:37"),
     ]))
 
     self._check_csv_response(response, {})
@@ -291,6 +292,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Code*", "OBJ-1"),
         ("Admin", "user@example.com"),
         ("Title", "Object Title"),
+        ("Due Date*", "2016-10-24T15:35:37"),
         (alias, value),
     ]))
 
@@ -375,6 +377,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Code*", "ISSUE-1"),
         ("Admin", "user@example.com"),
         ("Title", "Issue Title"),
+        ("Due Date*", "2016-10-24T15:35:37"),
         (alias, value),
     ]))
     self._check_csv_response(response, expected_messages)
@@ -399,6 +402,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Admin", "user@example.com"),
         ("Title", "Issue Title"),
         ("Hotlist ID", value),
+        ("Due Date*", "2016-10-24T15:35:37"),
     ]))
     self._check_csv_response(response, expected_messages)
     issue = all_models.Issue.query.one()
@@ -422,6 +426,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Admin", "user@example.com"),
         ("Title", "Issue Title"),
         ("Component ID", value),
+        ("Due Date*", "2016-10-24T15:35:37"),
     ]))
     self._check_csv_response(response, expected_messages)
     issue = all_models.Issue.query.one()
@@ -878,6 +883,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Title", "Object Title"),
         ("State", status),
         ("Ticket Tracker Integration", "On"),
+        ("Due Date*", "2016-10-24T15:35:37"),
     ]))
     self._check_csv_response(response, expected_messages)
     obj = all_models.Issue.query.one()
@@ -925,6 +931,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("State", status),
         ("Title", "Object Title"),
         ("Ticket Tracker Integration", "On"),
+        ("Due Date*", "2016-10-24T15:35:37"),
     ]))
     self._check_csv_response(response, {})
     obj = all_models.Issue.query.one()
@@ -1001,6 +1008,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Creators", "user@example.com"),
         ("Title", "Object Title"),
         ("Ticket Tracker Integration", "On"),
+        ("Due Date*", "2016-10-24T15:35:37"),
     ]))
     self._check_csv_response(response, {})
     assmt = all_models.Assessment.query.one()

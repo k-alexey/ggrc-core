@@ -34,6 +34,7 @@ class TestImportIssues(TestCase):
           ("Title*", "Test issue {}".format(i)),
           ("Admin*", "user@example.com"),
           ("map:Audit", audit.slug),
+          ("Due Date*", "2016-10-24T15:35:37")
       ]))
       self._check_csv_response(response, {})
 
@@ -122,6 +123,7 @@ class TestImportIssues(TestCase):
           ("Admin*", "user@example.com"),
           ("map:Audit", audit.slug),
           ("State", statuses[i]),
+          ("Due Date*", "2016-10-24T15:35:37"),
       ]))
 
     response = self.import_data(*imported_data)
