@@ -17,7 +17,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '84c5ff059f75'
-down_revision = '42afbc0e6c09'
+down_revision = 'cfe397ab518c'
 
 
 # We need to create a migration for existing issues in statuses Fixed,
