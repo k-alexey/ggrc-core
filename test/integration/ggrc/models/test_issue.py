@@ -98,7 +98,8 @@ class TestIssueDueDate(TestCase):
     response = self.api.post(all_models.Issue,
                              data={"issue": {"title": "TestDueDate",
                                              "context": None}})
-    self.assertEqual(400, response.status_code)
+    self.assert400(response)
+    self.assertIn("Due Date for the issue is not specified", response.data)
 
 
 class TestIssueAuditMapping(TestCase):
