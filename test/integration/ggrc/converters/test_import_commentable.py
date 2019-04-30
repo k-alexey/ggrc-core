@@ -19,7 +19,6 @@ class TestImportCommentable(TestCase):
   @ddt.data(
       all_models.Objective,
       all_models.Requirement,
-      all_models.Issue,
       all_models.Regulation,
       all_models.Policy,
       all_models.Standard,
