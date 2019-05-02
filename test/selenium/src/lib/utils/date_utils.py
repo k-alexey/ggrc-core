@@ -25,7 +25,7 @@ def first_working_day(date):
   return date
 
 
-def first_working_day_after_today(date):
+def first_working_day_after_today(date=datetime.date.today()):
   """Returns the nearest working day today or in future.
   """
   date = date + datetime.timedelta(days=1)

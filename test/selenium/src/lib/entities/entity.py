@@ -5,7 +5,7 @@
 # pylint: disable=too-few-public-methods
 
 import copy
-from datetime import datetime
+from datetime import date, datetime
 
 from dateutil import parser, tz
 
@@ -130,7 +130,9 @@ class Representation(object):
                 _ for _ in objs)):
           objs = [_.__dict__ for _ in objs]
       else:
-        if (not isinstance(objs, dict) and
+        if isinstance(objs, date):
+          objs = objs.__str__()
+        elif (not isinstance(objs, dict) and
                 not isinstance(objs, (str, unicode, int))):
           objs = objs.__dict__
       return objs
@@ -811,6 +813,10 @@ class AssessmentEntity(Entity):
 
 class IssueEntity(Entity):
   """Class that represent model for Issue entity."""
+
+  def __init__(self, **attrs):
+    super(IssueEntity, self).__init__()
+    self.set_attrs("due_date", **attrs)
 
 
 class ReviewEntity(Entity):

@@ -98,11 +98,12 @@ class Datepicker(object):
   def _set_date(self, date):
     """Sets active date in datepicker using JQuery UI Datepicker API."""
     jquery_ui_picker_el = self._root.element(class_name="datepicker__calendar")
+    date = date if isinstance(date, str) else date.strftime("%Y-%m-%d")
     self._root.browser.execute_script("""
       var datepicker_el = $(arguments[0]);
       var date = arguments[1];
       datepicker_el.datepicker("setDate", date);
-    """, jquery_ui_picker_el, date.strftime("%Y-%m-%d"))
+    """, jquery_ui_picker_el, date)
 
   def _click_active_date(self):
     """Clicks date that is marked as active."""

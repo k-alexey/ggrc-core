@@ -5,6 +5,7 @@
   "status": null,
   "recipients": null,
   "context": null,
+  "due_date": null,
   "custom_attribute_definitions": [],
   "custom_attributes": {},
   "access_control_list": [],

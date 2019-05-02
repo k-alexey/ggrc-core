@@ -18,7 +18,7 @@ from lib.entities import entity
 from lib.entities.entity import (
     PersonEntity, CustomAttributeDefinitionEntity, CommentEntity,
     ControlEntity)
-from lib.utils import help_utils, string_utils
+from lib.utils import date_utils, help_utils, string_utils
 from lib.utils.string_utils import StringMethods
 
 
@@ -692,7 +692,8 @@ class IssuesFactory(EntitiesFactory):
     'is_add_rest_attrs' then add attributes for REST."""
     issue_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        status=unicode(object_states.DRAFT))
+        status=unicode(object_states.DRAFT),
+        due_date=date_utils.first_working_day_after_today())
     if is_add_rest_attrs:
       issue_obj.update_attrs(
           recipients=",".join((

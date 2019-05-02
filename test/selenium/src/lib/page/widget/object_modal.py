@@ -19,6 +19,7 @@ def get_modal_obj(obj_type, _selenium=None):
   """Gets modal obj for `obj_type`."""
   mapping = {
       "assessment": AssessmentModal,
+      "issue": IssueModal,
       "control": ControlModal,
       "risk": RiskModal,
       "workflow": WorkflowModal,
@@ -209,6 +210,20 @@ class AssessmentModal(BaseObjectModal):
     """Gets titles of mapped snapshots."""
     els = self._root.elements(class_name="modal-mapped-objects-item")
     return [el.element(class_name="title").text for el in els]
+
+
+class IssueModal(BaseObjectModal):
+  """Represents issue object modal."""
+
+  def __init__(self):
+    super(IssueModal, self).__init__()
+    self._fields = ["title", "description", "status", "slug", "due_date"]
+    self._due_date_picker = page_elements.Datepicker(
+        self._root.element(id="issue-due-date"))
+
+  def set_due_date(self, date):
+    """Sets a date in the due date datepicker."""
+    self._due_date_picker.set_value(date)
 
 
 class WorkflowModal(BaseObjectModal):
