@@ -112,7 +112,7 @@
         <effective-dates {instance}="{instance}"></effective-dates>
       </div>
       <div class="span4 {{#instance.computed_errors.due_date}}field-failure{{/instance.computed_errors.due_date}}">
-        <datepicker-component {(date)}="{instance.due_date}" {label}="'Due Date'"
+        <datepicker-component id="issue-due-date" {(date)}="{instance.due_date}" {label}="'Due Date'"
                               {required}="{true}" tabindex="21">
         </datepicker-component>
         {{#instance.computed_errors.due_date}}
