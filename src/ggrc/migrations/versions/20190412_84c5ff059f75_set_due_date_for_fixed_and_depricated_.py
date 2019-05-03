@@ -37,22 +37,17 @@ def get_issues_without_due_date(connection):
 def get_revision_due_date(con, issue_id):
   """Fund due_date value in related revision"""
   query = "SELECT content, created_at FROM revisions WHERE " \
-          "resource_type = 'Issue' AND resource_id = :id"
+          "resource_type = 'Issue' AND resource_id = :id" \
+          "ORDER BY id DESC"
   all_revisions = con.execute(sa.text(query), id=issue_id)
-  all_dates = []
-  prev_revision_content = None
+  result = None
   for rev in all_revisions:
-    doc = json.loads(rev['content'])
-    if doc['status'] in STATUSES:
-      if prev_revision_content:
-        if prev_revision_content['status'] != doc['status']:
-          all_dates.append(rev['created_at'])
-      else:
-        all_dates.append(rev['created_at'])
-    prev_revision_content = doc
-  if all_dates:
-    return max(all_dates)
-  return None
+    if not result:
+      last_status = json.loads(rev['content'])['status']
+    elif json.loads(rev['content'])['status'] != last_status:
+      break
+    result = rev['created_at']
+  return result
 
 
 def set_due_date(con, issue_id, due_date):
