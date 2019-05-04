@@ -113,7 +113,9 @@ class TestWorkflowAclPropagation(TestCase):
       for t in threads:
         t.start()
       for t in threads:
-        t.join()
+        t.join(60)
+        self.assertFalse(t.isAlive(),
+                         "Threads aren't finished in reasonable time")
 
       acl = all_models.AccessControlList
 
