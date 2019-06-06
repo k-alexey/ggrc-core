@@ -4,11 +4,21 @@
 """Integration tests for Assessment Generation"""
 
 import collections
-import ddt
+import csv
+import datetime
+import time
+import uuid
 
+import ddt
+import flask
+from flask.ext.sqlalchemy import get_debug_queries
+
+from appengine.base import with_memcache
 from ggrc import db
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models import all_models
+from integration import ggrc
+from integration.ggrc import generator
 
 from integration.ggrc.models import factories
 from integration.ggrc.models.test_assessment_base import TestAssessmentBase
@@ -607,3 +617,157 @@ class TestAssessmentGeneration(TestAssessmentBase):
     # If Auditor is not set, Audit Captain should be used as Assignee
     self.assert_assignees("Assignees", response, acp.person.email)
     self.assert_assignees("Verifiers", response, acp.person.email)
+
+
+@with_memcache
+class TestAssessmentGen(ggrc.TestCase):
+
+  def setUp(self):
+    super(TestAssessmentGen, self).setUp()
+    self.api = ggrc.api_helper.Api()
+    user = all_models.Person.query.get(2)
+    self.api.set_user(user)
+    self.generator = generator.ObjectGenerator()
+
+    @db.app.after_request
+    def after_request(response):
+      """Print out request time"""
+      queries = get_debug_queries()
+      query_time = sum(query.duration for query in queries)
+      start_time, start_clock = flask.g.request_start
+      total = time.time() - start_time
+      total_cpu = time.clock() - start_clock
+      str_ = u"%.2fs (%.2fs CPU and %.2fs for %-2s db queries) '%s %s' %s"
+      payload = (total, total_cpu, query_time, len(queries),
+                 flask.request.method, flask.request.path, response.status)
+      if total > 10:
+        print str_%payload
+
+        dur = collections.defaultdict(int)
+        count = collections.defaultdict(int)
+        loc = dict()
+        for q in get_debug_queries():
+          dur[q.statement] = dur[q.statement] + q.duration
+          count[q.statement] = count[q.statement] + 1
+          loc[q.statement] = q[4]
+        result = []
+        for k in sorted(dur.keys(), key=lambda o: dur[o], reverse=True):
+          if dur[k] > 2:
+            result.append((datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+                           k,
+                           loc[k],
+                           dur[k],
+                           count[k]))
+
+        myFile = open('queries_30_750.csv', 'a')
+        with myFile:
+           writer = csv.writer(myFile)
+           writer.writerows(result)
+
+      return response
+
+  @staticmethod
+  def acl(_role, _type):
+    return {
+        "access_control_list": [{
+            "ac_role_id": all_models.AccessControlRole.query.filter_by(
+                name=_role,
+                object_type=_type,
+            ).first().id,
+            "person": {
+                "id": 2,
+                "type": "Person",
+            }
+        }]
+    }
+
+  @staticmethod
+  def assessment_dict(audit_id, snapshot_id, audit_context_id, asmt_tmpl_id,
+                      cavs, cads):
+    return {
+        "assessment": {
+            "_generated": True,
+            "audit": {
+                "id": audit_id,
+                "type": "Audit"
+            },
+            "object": {
+                "id": snapshot_id,
+                "type": "Snapshot"
+            },
+            "context": {
+                "id": audit_context_id,
+                "type": "Context"
+            },
+            "template": {
+                "id": asmt_tmpl_id,
+                "type": "AssessmentTemplate"
+            },
+            "title": str(uuid.uuid4()),
+            "custom_attribute_values": cavs,
+            "custom_attribute_definitions": cads,
+        }
+    }
+
+  def test_generate(self):
+    for _ in range(30):
+      program = self.generator.generate_object(all_models.Program,
+                                               self.acl("Program Managers",
+                                                        "Program"))[1]
+      program_id = program.id
+      objective = self.generator.generate_object(all_models.Objective,
+                                                 self.acl("Admin",
+                                                          "Objective"))[1]
+      self.generator.generate_relationship(program, objective)
+      asmts = []
+      for _ in range(4):
+        audit_data = self.acl("Audit Captains", "Audit")
+        audit_data.update({"program": {"id": program_id}})
+        audit = self.generator.generate_object(all_models.Audit, audit_data)[1]
+        audit_id = audit.id
+        audit_title = audit.title
+        audit_context_id = audit.context.id
+        snapshot_id = audit.snapshots[0].id
+        asmt_tmpl_data = {
+            "test_plan_procedure": True,
+            "template_object_type": "Objective",
+            "default_people": {
+                "assignees": "Principal Assignees",
+                "verifiers": "Auditors"
+            },
+            "status": "Draft",
+            "issue_tracker": {},
+            "audit": {
+                "id": audit_id,
+                "type": "Audit",
+                "title": audit_title,
+            },
+            "context": {"id": audit_context_id},
+            "errors": {},
+            "custom_attribute_definitions": [
+              {
+                  "title": str(uuid.uuid4()),
+                  "attribute_type": "Text",
+                  "multi_choice_options": "",
+                  "attribute_name": "Text",
+                  "mandatory": False
+              } for _ in range(10)
+            ],
+        }
+        asmt_tmpl = self.generator.generate_object(
+            all_models.AssessmentTemplate,
+            asmt_tmpl_data,
+        )[1]
+        asmt_tmpl_id = asmt_tmpl.id
+        cads = [cad.log_json() for cad in asmt_tmpl.custom_attribute_definitions]
+        cavs = []
+        for cad in asmt_tmpl.custom_attribute_definitions:
+          cavs.append({
+              "attribute_value": str(uuid.uuid4()),
+              "custom_attribute_id": cad.id,
+          })
+        for _ in range(10):
+          asmts.append(self.assessment_dict(audit_id, snapshot_id,
+                                            audit_context_id, asmt_tmpl_id,
+                                            cavs, cads))
+      resp = self.api.post(all_models.Assessment, asmts)
