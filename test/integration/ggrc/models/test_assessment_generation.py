@@ -682,8 +682,9 @@ class TestAssessmentGen(ggrc.TestCase):
     }
 
   @staticmethod
-  def assessment_dict(audit_id, snapshot_id, audit_context_id, asmt_tmpl_id,
-                      cavs, cads):
+  def assessment_dict(audit_id, snapshot_id, audit_context_id,
+                      # asmt_tmpl_id, cavs, cads
+                      ):
     return {
         "assessment": {
             "_generated": True,
@@ -699,18 +700,18 @@ class TestAssessmentGen(ggrc.TestCase):
                 "id": audit_context_id,
                 "type": "Context"
             },
-            "template": {
-                "id": asmt_tmpl_id,
-                "type": "AssessmentTemplate"
-            },
+            # "template": {
+            #     "id": asmt_tmpl_id,
+            #     "type": "AssessmentTemplate"
+            # },
             "title": str(uuid.uuid4()),
-            "custom_attribute_values": cavs,
-            "custom_attribute_definitions": cads,
+            # "custom_attribute_values": cavs,
+            # "custom_attribute_definitions": cads,
         }
     }
 
   def test_generate(self):
-    for _ in range(30):
+    for _ in range(10):
       program = self.generator.generate_object(all_models.Program,
                                                self.acl("Program Managers",
                                                         "Program"))[1]
@@ -728,46 +729,47 @@ class TestAssessmentGen(ggrc.TestCase):
         audit_title = audit.title
         audit_context_id = audit.context.id
         snapshot_id = audit.snapshots[0].id
-        asmt_tmpl_data = {
-            "test_plan_procedure": True,
-            "template_object_type": "Objective",
-            "default_people": {
-                "assignees": "Principal Assignees",
-                "verifiers": "Auditors"
-            },
-            "status": "Draft",
-            "issue_tracker": {},
-            "audit": {
-                "id": audit_id,
-                "type": "Audit",
-                "title": audit_title,
-            },
-            "context": {"id": audit_context_id},
-            "errors": {},
-            "custom_attribute_definitions": [
-              {
-                  "title": str(uuid.uuid4()),
-                  "attribute_type": "Text",
-                  "multi_choice_options": "",
-                  "attribute_name": "Text",
-                  "mandatory": False
-              } for _ in range(10)
-            ],
-        }
-        asmt_tmpl = self.generator.generate_object(
-            all_models.AssessmentTemplate,
-            asmt_tmpl_data,
-        )[1]
-        asmt_tmpl_id = asmt_tmpl.id
-        cads = [cad.log_json() for cad in asmt_tmpl.custom_attribute_definitions]
-        cavs = []
-        for cad in asmt_tmpl.custom_attribute_definitions:
-          cavs.append({
-              "attribute_value": str(uuid.uuid4()),
-              "custom_attribute_id": cad.id,
-          })
+        # asmt_tmpl_data = {
+        #     "test_plan_procedure": True,
+        #     "template_object_type": "Objective",
+        #     "default_people": {
+        #         "assignees": "Principal Assignees",
+        #         "verifiers": "Auditors"
+        #     },
+        #     "status": "Draft",
+        #     "issue_tracker": {},
+        #     "audit": {
+        #         "id": audit_id,
+        #         "type": "Audit",
+        #         "title": audit_title,
+        #     },
+        #     "context": {"id": audit_context_id},
+        #     "errors": {},
+        #     "custom_attribute_definitions": [
+        #       {
+        #           "title": str(uuid.uuid4()),
+        #           "attribute_type": "Text",
+        #           "multi_choice_options": "",
+        #           "attribute_name": "Text",
+        #           "mandatory": False
+        #       } for _ in range(10)
+        #     ],
+        # }
+        # asmt_tmpl = self.generator.generate_object(
+        #     all_models.AssessmentTemplate,
+        #     asmt_tmpl_data,
+        # )[1]
+        # asmt_tmpl_id = asmt_tmpl.id
+        # cads = [cad.log_json() for cad in asmt_tmpl.custom_attribute_definitions]
+        # cavs = []
+        # for cad in asmt_tmpl.custom_attribute_definitions:
+        #   cavs.append({
+        #       "attribute_value": str(uuid.uuid4()),
+        #       "custom_attribute_id": cad.id,
+        #   })
         for _ in range(10):
           asmts.append(self.assessment_dict(audit_id, snapshot_id,
-                                            audit_context_id, asmt_tmpl_id,
-                                            cavs, cads))
+                                            audit_context_id,
+                                            # asmt_tmpl_id, cavs, cads
+                                            ))
       resp = self.api.post(all_models.Assessment, asmts)
