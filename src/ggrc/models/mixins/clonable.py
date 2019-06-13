@@ -14,6 +14,7 @@ import sqlalchemy as sa
 from werkzeug import exceptions
 
 from ggrc import db
+from ggrc.cache import utils as cache_utils
 from ggrc.models import relationship, inflector
 from ggrc.rbac import permissions
 from ggrc.services import signals
@@ -187,6 +188,7 @@ class MultiClonable(object):
         collections.append(
             views.build_collection_representation(cls, obj.log_json())
         )
+    cache_utils.clear_permission_cache()
     return views.json_success_response(collections, datetime.datetime.utcnow())
 
   def _clone(self, target=None):

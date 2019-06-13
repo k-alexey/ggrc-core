@@ -5,14 +5,18 @@
 import ddt
 from mock import patch
 
+from appengine.base import with_memcache
 from ggrc import db
 from ggrc import models
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.people import AccessControlPerson
+from ggrc.models import all_models
 from ggrc.snapshotter.rules import Types
 
 from integration.ggrc import generator
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 from integration.ggrc.models import factories
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 
@@ -702,3 +706,48 @@ class TestClonable(SnapshotterBaseTestCase):
         models.AssessmentTemplate.id != assessment_template.id
     ).first()
     self.assertEqual(template_copy.status, status)
+
+
+@with_memcache
+class TestClonableWithMemcache(TestClonable):
+  """Test case for Clonable mixin with turned onn memcache"""
+
+  def test_asmnt_template_clone_gc(self):
+    """Test assessment template cloning"""
+    with factories.single_commit():
+      role = all_models.Role.query.filter(
+          all_models.Role.name == "Creator"
+      ).one()
+      user = factories.PersonFactory()
+      rbac_factories.UserRoleFactory(role=role, person=user)
+    self.api.set_user(user)
+    with factories.single_commit():
+      audit1 = factories.AuditFactory()
+      audit1.add_person_with_role_name(user, "Audit Captains")
+      audit2 = factories.AuditFactory()
+      audit2.add_person_with_role_name(user, "Audit Captains")
+      audit2_id = audit2.id
+      assessment_template = factories.AssessmentTemplateFactory(
+          template_object_type="Control",
+          procedure_description="Test procedure",
+          title="Test clone of Assessment Template",
+          context=audit1.context,
+      )
+      factories.RelationshipFactory(
+          source=audit1,
+          destination=assessment_template
+      )
+
+    self.clone_asmnt_templates([assessment_template.id], audit2)
+    query_request_data = [{
+        "object_name": "AssessmentTemplate",
+        "filters": {
+            "expression": {
+                "object_name": "Audit",
+                "op": {"name": "relevant"},
+                "ids": [str(audit2_id)]}},
+    }]
+    result = self.api.send_request(self.api.client.post,
+                                   data=query_request_data,
+                                   api_link="/query")
+    self.assertEqual(result.json[0]["AssessmentTemplate"]["count"], 1)
