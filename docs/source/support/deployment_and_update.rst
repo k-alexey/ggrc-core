@@ -136,6 +136,8 @@ Settings from ``settings.sh``
 | EXTERNAL_APP_USER                  | Name and email of the user that will be used for external applications    |
 |                                    | auth.                                                                     |
 +------------------------------------+---------------------------------------------------------------------------+
+| SYNC_SERVICE_USER                  | Name and email of the user that will be used by sync service              |
++------------------------------------+---------------------------------------------------------------------------+
 | URLFETCH_SERVICE_ID                | Value for ``X-URLFetch-Service-Id`` header for requests to Person service |
 +------------------------------------+---------------------------------------------------------------------------+
 | ISSUE_TRACKER_BUG_URL_TMPL         | Template for a link to a bug in an external bug tracker                   |
