@@ -47,19 +47,21 @@ def _handle_assessment(assessment, src):
   common.map_objects(assessment, src.get('audit'))
   snapshot = referenced_objects.get("Snapshot", snapshot_dict.get('id'))
 
-  if not src.get('_generated') and not snapshot:
-    return
-
   template = referenced_objects.get(
       src.get('template', {}).get('type'),
       src.get('template', {}).get('id'),
   )
+  if template:
+    relate_ca(assessment, template)
+
+  if not src.get('_generated') and not snapshot:
+    return
+
   audit = referenced_objects.get(
       src['audit']['type'],
       src['audit']['id'],
   )
   relate_assignees(assessment, snapshot, template, audit)
-  relate_ca(assessment, template)
   assessment.title = u'{} assessment for {}'.format(
       snapshot.revision.content['title'],
       audit.title,
