@@ -288,10 +288,12 @@ def update_cad_related_objects(task):
   modified_by_id = task.parameters.get("modified_by_id")
 
   event = models.all_models.Event.query.filter_by(id=event_id).first()
-  cad = models.all_models.CustomAttributeDefinition.query.filter_by(
-      id=event.resource_id
-  ).first()
   model = models.get_model(model_name)
+  if issubclass(model, models.mixins.ExternalCustomAttributable):
+    cad_model = models.all_models.ExternalCustomAttributeDefinition
+  else:
+    cad_model = models.all_models.CustomAttributeDefinition
+  cad = cad_model.query.filter_by(id=event.resource_id).first()
   query = db.session.query(model if need_revisions else model.id)
   objects_count = len(query.all())
   handled_objects = 0
