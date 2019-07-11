@@ -640,7 +640,7 @@ class TestAssessmentGen(ggrc.TestCase):
       str_ = u"%.2fs (%.2fs CPU and %.2fs for %-2s db queries) '%s %s' %s"
       payload = (total, total_cpu, query_time, len(queries),
                  flask.request.method, flask.request.path, response.status)
-      if total > 10:
+      if "api/assessments" in flask.request.path:
         print str_%payload
 
         dur = collections.defaultdict(int)
@@ -704,7 +704,7 @@ class TestAssessmentGen(ggrc.TestCase):
                 "type": "AssessmentTemplate"
             },
             "title": str(uuid.uuid4()),
-            "custom_attribute_values": cavs,
+            # "custom_attribute_values": cavs,
             "custom_attribute_definitions": cads,
         }
     }
@@ -766,8 +766,8 @@ class TestAssessmentGen(ggrc.TestCase):
               "attribute_value": str(uuid.uuid4()),
               "custom_attribute_id": cad.id,
           })
-        for _ in range(10):
+        for _ in range(750):
           asmts.append(self.assessment_dict(audit_id, snapshot_id,
                                             audit_context_id, asmt_tmpl_id,
                                             cavs, cads))
-      resp = self.api.post(all_models.Assessment, asmts)
+      self.api.post(all_models.Assessment, asmts)

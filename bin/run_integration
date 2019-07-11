@@ -7,7 +7,7 @@ cd "${SCRIPTPATH}/../test"
 
 source "${SCRIPTPATH}/init_test_env"
 
-db_reset -d "ggrcdevtest"
+db_reset -d "ggrcdev"
 
 echo -e "\nRunning integration tests"
-nosetests integration --with-xunit --logging-clear-handlers ${@:1}
+nosetests integration.ggrc.models.test_assessment_generation.py:TestAssessmentGen -v -s
