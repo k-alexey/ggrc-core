@@ -224,7 +224,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   def validate_component_id(self, _, value):
     """Validates that component_id is in allowlist"""
     # pylint: disable=no-self-use
-    if str(value) not in get_allowed_components_ids():
+    if value and str(value) not in get_allowed_components_ids():
       raise exceptions.ValidationError(
           "Field 'Component ID' contains not allowed value. To include this "
           "Component ID into the list of allowed components please raise "
