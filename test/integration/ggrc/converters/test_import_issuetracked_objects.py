@@ -61,25 +61,25 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.patch_create_issue.stop()
 
   @ddt.data(
-      ("Issue", "Issue", "component_id", "Component ID", 123),
+      ("Issue", "Issue", "component_id", "Component ID", 398781),
       ("Issue", "Issue", "hotlist_id", "Hotlist ID", 321),
       ("Issue", "Issue", "issue_priority", "Priority", "P1"),
       ("Issue", "Issue", "issue_severity", "Severity", "S1"),
       ("Issue", "Issue", "issue_type", "Issue Type", "PROCESS"),
       ("Issue", "Issue", "title", "Ticket Title", "iti_title"),
-      ("Assessment", "Assessment", "component_id", "Component ID", 123),
+      ("Assessment", "Assessment", "component_id", "Component ID", 188208),
       ("Assessment", "Assessment", "hotlist_id", "Hotlist ID", 321),
       ("Assessment", "Assessment", "issue_priority", "Priority", "P1"),
       ("Assessment", "Assessment", "issue_severity", "Severity", "S1"),
       ("Assessment", "Assessment", "issue_type", "Issue Type", "PROCESS"),
       ("Assessment", "Assessment", "title", "Ticket Title", "iti_title"),
-      ("Audit", "Audit", "component_id", "Component ID", 123),
+      ("Audit", "Audit", "component_id", "Component ID", 188208),
       ("Audit", "Audit", "hotlist_id", "Hotlist ID", 321),
       ("Audit", "Audit", "issue_priority", "Priority", "P1"),
       ("Audit", "Audit", "issue_severity", "Severity", "S1"),
       ("Audit", "Audit", "issue_type", "Issue Type", "PROCESS"),
       ("AssessmentTemplate", "Assessment Template", "component_id",
-       "Component ID", 123),
+       "Component ID", 188208),
       ("AssessmentTemplate", "Assessment Template", "hotlist_id",
        "Hotlist ID", 321),
       ("AssessmentTemplate", "Assessment Template", "issue_priority",
@@ -111,7 +111,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.assertEqual(str(obj.issue_tracker[field]), str(value))
 
   @ddt.data(
-      ("component_id", "Component ID", 123),
+      ("component_id", "Component ID", 398781),
       ("hotlist_id", "Hotlist ID", 321),
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
@@ -135,7 +135,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.assertEqual(str(obj.issue_tracker[field]), str(value))
 
   @ddt.data(
-      ("component_id", "Component ID", 555),
+      ("component_id", "Component ID", 188208),
       ("hotlist_id", "Hotlist ID", 444),
       ("issue_priority", "Priority", "P2"),
       ("issue_severity", "Severity", "S2"),
@@ -161,7 +161,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.assertEqual(str(obj.issue_tracker[field]), str(value))
 
   @ddt.data(
-      ("component_id", "Component ID", 555),
+      ("component_id", "Component ID", 188208),
       ("hotlist_id", "Hotlist ID", 444),
       ("issue_priority", "Priority", "P2"),
       ("issue_severity", "Severity", "S2"),
@@ -318,7 +318,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
                      str(default_values[missed_field]))
 
   @ddt.data(
-      ("component_id", "Component ID", 123),
+      ("component_id", "Component ID", 188208),
       ("hotlist_id", "Hotlist ID", 321),
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
@@ -515,8 +515,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
     update_mock.assert_called_once()
 
   @ddt.data(
-      ("component_id", "Component ID", "", 123),
-      ("component_id", "Component ID", "sss", 456),
+      ("component_id", "Component ID", "", 188208),
+      ("component_id", "Component ID", "sss", 188208),
       ("hotlist_id", "Hotlist ID", "", 789),
       ("hotlist_id", "Hotlist ID", "aaa", 589),
       ("issue_priority", "Priority", "", "P4"),
@@ -616,8 +616,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
                      str(default_values[missed_field]))
 
   @ddt.data(
-      ("component_id", "Component ID", "", 123),
-      ("component_id", "Component ID", "sss", 456),
+      ("component_id", "Component ID", "", 188208),
+      ("component_id", "Component ID", "sss", 188208),
       ("hotlist_id", "Hotlist ID", "", 789),
       ("hotlist_id", "Hotlist ID", "aaa", 589),
       ("issue_priority", "Priority", "", "P4"),
@@ -716,9 +716,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
                      str(default_values[missed_field]))
 
   @ddt.data(
-      ("component_id", "Component ID", "", 123),
-      ("component_id", "Component ID", "sss", 123),
-      ("component_id", "Component ID", None, 123),
+      ("component_id", "Component ID", "", 188208),
+      ("component_id", "Component ID", "sss", 188208),
+      ("component_id", "Component ID", None, 188208),
       ("hotlist_id", "Hotlist ID", "", 123),
       ("hotlist_id", "Hotlist ID", "aaa", 123),
       ("hotlist_id", "Hotlist ID", None, 123),
