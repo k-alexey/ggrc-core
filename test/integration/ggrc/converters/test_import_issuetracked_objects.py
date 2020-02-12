@@ -276,6 +276,33 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.assertEqual(str(issue.issue_tracker["component_id"]),
                      str(default_values["issue_component_id"]))
 
+  @ddt.data(("12345", False),
+            ("398781", True))
+  @ddt.unpack
+  def test_allowed_component_id(self, value, allowed):
+    """Test validation that component id is allowed."""
+    if not allowed:
+      expected_messages = {
+          "Issue": {
+              "row_errors": [
+                  "Line 3: Field 'Component ID' contains not allowed value. "
+                  "To include this Component ID into the list of allowed "
+                  "components please raise a ticket at "
+                  "{link}.".format(link=settings.CREATE_ISSUE_TICKET_LINK)]
+          }
+      }
+    else:
+      expected_messages = {}
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", ""),
+        ("Admin", "user@example.com"),
+        ("Title", "Issue Title"),
+        ("Component ID", value),
+        ("Due Date*", "2016-10-24T15:35:37"),
+    ]))
+    self._check_csv_response(response, expected_messages)
+
   @ddt.data(
       ("component_id", "Component ID", ""),
       ("component_id", "Component ID", "sss"),

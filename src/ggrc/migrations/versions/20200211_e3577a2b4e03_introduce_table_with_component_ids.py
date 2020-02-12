@@ -51,7 +51,6 @@ def upgrade():
         component_id=component_id)
 
 
-
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   raise NotImplementedError("Downgrade is not supported")
