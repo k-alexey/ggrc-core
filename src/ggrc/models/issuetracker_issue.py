@@ -8,6 +8,7 @@ import flask
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc import settings
 from ggrc.integrations import constants
 from ggrc.models import exceptions
 from ggrc.models.mixins import base
@@ -222,11 +223,12 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   @validates("component_id")
   def validate_component_id(self, _, value):
     """Validates that component_id is in allowlist"""
+    # pylint: disable=no-self-use
     if str(value) not in get_allowed_components_ids():
       raise exceptions.ValidationError(
           "Field 'Component ID' contains not allowed value. To include this "
           "Component ID into the list of allowed components please raise "
-          "a ticket at go/ggrc-buganizer-access.")
+          "a ticket at {link}.".format(link=settings.CREATE_ISSUE_TICKET_LINK))
     return value
 
 
